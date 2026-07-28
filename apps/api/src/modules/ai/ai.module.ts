@@ -3,6 +3,7 @@ import { AIJobsService } from './application/ai-jobs.service';
 import { AiOrchestratorService } from './application/ai-orchestrator.service';
 import { MockAIService } from './application/mock-ai.service';
 import { OpenAIService } from './application/openai-ai.service';
+import { MistralAIService } from './application/mistral-ai.service';
 import { OllamaAIService } from './application/ollama-ai.service';
 import { AiConfigService } from './application/ai-config.service';
 import { resolveAiProvider } from './application/resolve-ai-provider';
@@ -19,6 +20,7 @@ import { ConfigService } from '@nestjs/config';
     AiOrchestratorService,
     MockAIService,
     OpenAIService,
+    MistralAIService,
     OllamaAIService,
     AiConfigService,
     {
@@ -27,14 +29,16 @@ import { ConfigService } from '@nestjs/config';
         config: ConfigService,
         mock: MockAIService,
         openai: OpenAIService,
+        mistral: MistralAIService,
         ollama: OllamaAIService,
       ) => {
         const provider = resolveAiProvider(config);
         if (provider === 'openai') return openai;
+        if (provider === 'mistral') return mistral;
         if (provider === 'ollama') return ollama;
         return mock;
       },
-      inject: [ConfigService, MockAIService, OpenAIService, OllamaAIService],
+      inject: [ConfigService, MockAIService, OpenAIService, MistralAIService, OllamaAIService],
     },
   ],
   exports: [AIJobsService, AiOrchestratorService, AiConfigService],

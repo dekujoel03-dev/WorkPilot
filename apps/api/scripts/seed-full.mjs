@@ -4,9 +4,11 @@
  * Usage: pnpm db:seed  (ou pnpm db:demo pour setup + seed)
  * Mot de passe des comptes démo: Test1234!
  */
-import { PrismaClient } from '@prisma/client';
+import pkg from '@prisma/client';
 import bcrypt from 'bcrypt';
 import { randomBytes } from 'crypto';
+
+const { PrismaClient } = pkg;
 
 const prisma = new PrismaClient();
 const DEMO_PASSWORD = 'Test1234!';

@@ -4,7 +4,7 @@
   "private": true,
   "description": "Workspace intelligent — Moins de clics. Plus d'automatisation.",
   "scripts": {
-    "dev": "node scripts/ensure-ollama.mjs && pnpm --filter @work-pilot/api --filter @work-pilot/web --parallel run dev",
+    "dev": "pnpm --filter @work-pilot/api --filter @work-pilot/web --parallel run dev",
     "dev:api": "pnpm --filter @work-pilot/api dev",
     "dev:web": "pnpm --filter @work-pilot/web dev",
     "build": "pnpm --filter @work-pilot/shared build && pnpm --filter @work-pilot/api --filter @work-pilot/web --parallel run build",

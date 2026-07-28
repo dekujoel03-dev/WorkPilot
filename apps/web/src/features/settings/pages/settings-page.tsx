@@ -232,7 +232,11 @@ export function SettingsPage() {
                     ) : (
                       <Badge variant="success">
                         <CheckCircle2 className="h-3 w-3" />
-                        {ai?.provider === 'ollama' ? 'Ollama connecté' : 'OpenAI connecté'}
+                        {ai?.provider === 'mistral'
+                          ? 'Mistral connecté'
+                          : ai?.provider === 'ollama'
+                            ? 'Ollama connecté'
+                            : 'OpenAI connecté'}
                       </Badge>
                     )}
                   </div>
@@ -243,7 +247,13 @@ export function SettingsPage() {
                 {ai?.model && (
                   <SettingRow
                     label="Modèle"
-                    description={ai?.provider === 'ollama' ? 'Modèle Ollama local' : 'Version du modèle OpenAI'}
+                    description={
+                      ai?.provider === 'mistral'
+                        ? 'Modèle Mistral cloud'
+                        : ai?.provider === 'ollama'
+                          ? 'Modèle Ollama local'
+                          : 'Version du modèle OpenAI'
+                    }
                   >
                     <code className="text-xs bg-surface-sunken px-2 py-1 rounded-[var(--radius-sm)] border border-border">
                       {ai.model}
@@ -270,18 +280,23 @@ export function SettingsPage() {
                   <div className="mx-5 mb-5 rounded-[var(--radius-lg)] border border-border bg-surface-sunken/80 overflow-hidden">
                     <div className="px-4 py-2.5 border-b border-border bg-surface-hover/50">
                       <p className="text-xs font-medium text-muted">
-                        Activer Ollama (recommandé) ou OpenAI — <code className="text-foreground">apps/api/.env</code>
+                        Activer Mistral (recommandé), OpenAI ou Ollama — <code className="text-foreground">apps/api/.env</code>
                       </p>
                     </div>
                     <pre className="p-4 text-xs font-mono text-foreground/90 overflow-x-auto leading-relaxed">
-{`# Ollama local (défaut, installé au démarrage via pnpm dev)
-AI_PROVIDER=ollama
-OLLAMA_MODEL=llama3.2
+{`# Mistral cloud (défaut)
+AI_PROVIDER=mistral
+MISTRAL_API_KEY=votre-cle-api
+MISTRAL_MODEL=mistral-small-latest
 
 # Ou OpenAI cloud
 AI_PROVIDER=openai
 OPENAI_API_KEY=sk-...
-OPENAI_MODEL=gpt-4o-mini`}
+OPENAI_MODEL=gpt-4o-mini
+
+# Ou Ollama local
+AI_PROVIDER=ollama
+OLLAMA_MODEL=llama3.2`}
                     </pre>
                   </div>
                 )}

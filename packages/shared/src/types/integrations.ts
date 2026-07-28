@@ -8,7 +8,7 @@ export interface WebhookSummary {
 }
 
 export interface AIProviderStatus {
-  provider: 'ollama' | 'openai' | 'mock';
+  provider: 'mistral' | 'ollama' | 'openai' | 'mock';
   model: string | null;
   available: boolean;
   label: string;

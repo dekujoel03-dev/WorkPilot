@@ -21,6 +21,18 @@ export class AiConfigService {
       };
     }
 
+    if (provider === 'mistral') {
+      const model = this.config.get<string>('MISTRAL_MODEL', 'mistral-small-latest');
+      return {
+        data: {
+          provider,
+          model,
+          available: true,
+          label: `PM certifié PMP/Agile · Mistral (${model})`,
+        },
+      };
+    }
+
     if (provider === 'ollama') {
       const model = this.config.get<string>('OLLAMA_MODEL', 'llama3.2');
       return {
