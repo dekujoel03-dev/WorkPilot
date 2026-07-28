@@ -1,0 +1,32 @@
+{
+  "name": "work-pilot",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Workspace intelligent — Moins de clics. Plus d'automatisation.",
+  "scripts": {
+    "dev": "node scripts/ensure-ollama.mjs && pnpm --filter @work-pilot/api --filter @work-pilot/web --parallel run dev",
+    "dev:api": "pnpm --filter @work-pilot/api dev",
+    "dev:web": "pnpm --filter @work-pilot/web dev",
+    "build": "pnpm --filter @work-pilot/shared build && pnpm --filter @work-pilot/api --filter @work-pilot/web --parallel run build",
+    "build:api": "pnpm --filter @work-pilot/api build",
+    "build:web": "pnpm --filter @work-pilot/web build",
+    "db:setup": "pnpm --filter @work-pilot/api db:setup",
+    "db:migrate": "pnpm --filter @work-pilot/api db:migrate",
+    "db:generate": "pnpm --filter @work-pilot/api db:generate",
+    "db:studio": "pnpm --filter @work-pilot/api db:studio",
+    "db:seed": "pnpm --filter @work-pilot/api db:seed",
+    "db:demo": "pnpm db:migrate:deploy && pnpm db:seed",
+    "lint": "pnpm --filter @work-pilot/api --filter @work-pilot/web --parallel run lint",
+    "lint:api": "pnpm --filter @work-pilot/api lint",
+    "lint:web": "pnpm --filter @work-pilot/web lint",
+    "typecheck": "pnpm --filter @work-pilot/api --filter @work-pilot/web --parallel run typecheck",
+    "typecheck:api": "pnpm --filter @work-pilot/api typecheck",
+    "typecheck:web": "pnpm --filter @work-pilot/web typecheck",
+    "test": "pnpm --filter @work-pilot/api test"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@9.15.0"
+}

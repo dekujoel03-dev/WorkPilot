@@ -1,0 +1,100 @@
+import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+
+@Injectable()
+export class SupabaseService {
+  private readonly logger = new Logger(SupabaseService.name);
+  private readonly client: SupabaseClient | null;
+  readonly storageBucket: string;
+
+  constructor(private readonly config: ConfigService) {
+    const url = this.config.get<string>('SUPABASE_URL');
+    const serviceKey = this.config.get<string>('SUPABASE_SERVICE_ROLE_KEY');
+
+    this.storageBucket = this.config.get<string>('SUPABASE_STORAGE_BUCKET', 'attachments');
+
+    if (url && serviceKey) {
+      this.client = createClient(url, serviceKey, {
+        auth: { persistSession: false, autoRefreshToken: false },
+      });
+      this.logger.log('Supabase client configured');
+    } else {
+      this.client = null;
+      this.logger.warn('Supabase not configured — using local file storage fallback');
+    }
+  }
+
+  isConfigured(): boolean {
+    return this.client !== null;
+  }
+
+  async verifyAccessToken(accessToken: string) {
+    if (!this.client) {
+      throw new Error('Supabase is not configured');
+    }
+
+    const { data, error } = await this.client.auth.getUser(accessToken);
+    if (error || !data.user) {
+      throw new Error(error?.message ?? 'Invalid Supabase token');
+    }
+
+    return data.user;
+  }
+
+  async createAuthUser(email: string, password: string) {
+    if (!this.client) return null;
+
+    const { data, error } = await this.client.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+    });
+
+    if (error) {
+      if (error.message.toLowerCase().includes('already')) {
+        const { data: listData } = await this.client.auth.admin.listUsers();
+        const existing = listData.users.find(
+          (u) => u.email?.toLowerCase() === email.toLowerCase(),
+        );
+        return existing ?? null;
+      }
+      throw new Error(error.message);
+    }
+
+    return data.user;
+  }
+
+  async uploadFile(params: {
+    path: string;
+    buffer: Buffer;
+    contentType: string;
+  }): Promise<{ publicUrl: string }> {
+    if (!this.client) {
+      throw new Error('Supabase Storage is not configured');
+    }
+
+    const { error } = await this.client.storage
+      .from(this.storageBucket)
+      .upload(params.path, params.buffer, {
+        contentType: params.contentType,
+        upsert: false,
+      });
+
+    if (error) {
+      throw new Error(`Supabase upload failed: ${error.message}`);
+    }
+
+    const { data } = this.client.storage.from(this.storageBucket).getPublicUrl(params.path);
+    return { publicUrl: data.publicUrl };
+  }
+
+  async removeFile(path: string): Promise<void> {
+    if (!this.client) return;
+
+    const { error } = await this.client.storage.from(this.storageBucket).remove([path]);
+    if (error) {
+      this.logger.warn(`Supabase delete failed for ${path}: ${error.message}`);
+    }
+  }
+}
