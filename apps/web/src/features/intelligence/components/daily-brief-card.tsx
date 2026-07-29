@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Target, Calendar, AlertTriangle, Clock, Zap, Sparkles } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,6 +9,15 @@ import { useDailyBrief, useSyncReminders } from '../hooks/use-intelligence';
 import { useEffect } from 'react';
 import { useWorkspaceId } from '@/features/projects/hooks/use-projects';
 import { cn } from '@/lib/utils';
+import type { DailyBriefTask } from '@work-pilot/shared';
+
+function projectKanbanPath(task: DailyBriefTask) {
+  return `/app/projects/${task.projectId}`;
+}
+
+function projectKanbanState(task: DailyBriefTask) {
+  return { openTaskId: task.id };
+}
 
 export function DailyBriefCard() {
   const workspaceId = useWorkspaceId();
@@ -75,7 +85,11 @@ export function DailyBriefCard() {
           </div>
 
           {brief.mainGoal && (
-            <div className="flex items-start gap-4 p-4 rounded-[var(--radius-xl)] bg-gradient-to-br from-accent/8 to-transparent border border-accent/20">
+            <Link
+              to={projectKanbanPath(brief.mainGoal)}
+              state={projectKanbanState(brief.mainGoal)}
+              className="flex items-start gap-4 p-4 rounded-[var(--radius-xl)] bg-gradient-to-br from-accent/8 to-transparent border border-accent/20 hover:border-accent/40 hover:bg-accent/10 transition-colors cursor-pointer"
+            >
               <Target className="h-5 w-5 text-accent shrink-0 mt-0.5" />
               <div className="min-w-0">
                 <p className="text-[11px] font-semibold text-accent uppercase tracking-wider">Objectif du jour</p>
@@ -83,6 +97,29 @@ export function DailyBriefCard() {
                 {brief.mainGoal.projectName && (
                   <p className="text-xs text-muted mt-1">{brief.mainGoal.projectName}</p>
                 )}
+              </div>
+            </Link>
+          )}
+
+          {brief.meetings.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-sm font-semibold font-display">Réunions du jour</p>
+              <div className="rounded-[var(--radius-lg)] border border-border divide-y divide-border overflow-hidden">
+                {brief.meetings.map((meeting) => (
+                  <Link
+                    key={meeting.id}
+                    to="/app/calendar"
+                    className="flex items-center justify-between gap-3 text-sm px-4 py-3 bg-surface hover:bg-surface-hover transition-colors"
+                  >
+                    <span className="truncate font-medium">{meeting.title}</span>
+                    <span className="text-xs text-muted shrink-0 tabular-nums">
+                      {new Date(meeting.startTime).toLocaleTimeString('fr-FR', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </span>
+                  </Link>
+                ))}
               </div>
             </div>
           )}
@@ -92,9 +129,11 @@ export function DailyBriefCard() {
               <p className="text-sm font-semibold font-display">Tâches critiques</p>
               <div className="rounded-[var(--radius-lg)] border border-border divide-y divide-border overflow-hidden">
                 {brief.criticalTasks.slice(0, 3).map((t) => (
-                  <div
+                  <Link
                     key={t.id}
-                    className="flex items-center justify-between gap-3 text-sm px-4 py-3 bg-surface hover:bg-surface-hover transition-colors"
+                    to={projectKanbanPath(t)}
+                    state={projectKanbanState(t)}
+                    className="flex items-center justify-between gap-3 text-sm px-4 py-3 bg-surface hover:bg-surface-hover transition-colors cursor-pointer"
                   >
                     <span className="truncate font-medium">{t.title}</span>
                     {t.priority !== 'NONE' && (
@@ -102,7 +141,7 @@ export function DailyBriefCard() {
                         {PRIORITY_LABELS[t.priority] ?? t.priority}
                       </Badge>
                     )}
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>

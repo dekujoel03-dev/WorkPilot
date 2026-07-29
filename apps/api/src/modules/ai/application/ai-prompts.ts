@@ -1,6 +1,4 @@
-import type { AssistantMessage } from '@work-pilot/shared';
-
-/** Persona PMP & Agile — injecté dans chaque appel LLM. */
+/** Persona projet — injecté dans chaque appel LLM. */
 export const SENIOR_PM_SYSTEM_PROMPT = `Tu es un Project Manager certifié PMP (PMI) et praticien Agile (Scrum, Kanban, SAFe). Tu travailles exclusivement dans WorkPilot.
 
 LIVRABLES AUTORISÉS (uniquement) :
@@ -149,30 +147,5 @@ Règles :
 JSON attendu :
 ${ASSISTANT_JSON_SCHEMA}
 
-Message utilisateur : ${input.message}`;
-}
-
-export function buildAssistantChatPrompt(input: {
-  message: string;
-  history?: AssistantMessage[];
-  workspaceName?: string;
-}): string {
-  const history = (input.history ?? [])
-    .slice(-6)
-    .map((m) => `${m.role === 'user' ? 'Utilisateur' : 'Assistant'}: ${m.content}`)
-    .join('\n');
-
-  return `Workspace « ${input.workspaceName ?? 'Workspace'} ».
-
-Produis un livrable PM certifié PMP/Agile, exportable vers WorkPilot.
-
-JSON attendu :
-${ASSISTANT_JSON_SCHEMA}
-
-Règles :
-- reply : document aéré en sections numérotées, paragraphes courts, ZÉRO puce, ZÉRO code
-- Remplis userStories, risks ou suggestedTasks selon le type de demande
-- Si l'utilisateur demande moins de densité, simplifie et aère le document
-${history ? `\nHistorique récent :\n${history}\n` : ''}
 Message utilisateur : ${input.message}`;
 }

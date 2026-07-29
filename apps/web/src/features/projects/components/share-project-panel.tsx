@@ -74,7 +74,7 @@ export function ShareProjectPanel({ projectId }: ShareProjectPanelProps) {
       </Button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 z-40 w-80 rounded-[var(--radius-lg)] border border-border bg-surface shadow-lg p-4 space-y-4">
+        <div className="absolute right-0 top-full mt-2 z-30 w-80 rounded-[var(--radius-lg)] border border-border bg-surface shadow-lg p-4 space-y-4">
           <div>
             <p className="text-sm font-semibold">Partager le projet</p>
             <p className="text-xs text-muted mt-0.5">

@@ -41,6 +41,9 @@ export type {
   DashboardStats,
   CalendarEvent,
   CreateMeetingInput,
+  UpdateMeetingInput,
+  MeetingItem,
+  MeetingStatus,
 } from './types/phase4';
 export type {
   AIJob,
@@ -77,5 +80,5 @@ export type {
   AIProviderStatus,
   AddProjectMemberResult,
 } from './types/integrations';
-export { parseProjectBreakdownOutput, parseMeetingSummaryOutput, parseAssistantResponse } from './utils/ai-output';
+export { parseProjectBreakdownOutput, parseAssistantResponse } from './utils/ai-output';
 export { calculateProjectProgress } from './utils/task-progress';

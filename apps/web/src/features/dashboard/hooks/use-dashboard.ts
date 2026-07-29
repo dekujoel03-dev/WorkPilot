@@ -9,6 +9,9 @@ export function useDashboardStats() {
     queryKey: ['dashboard-stats', workspaceId],
     queryFn: () => dashboardApi.stats(workspaceId!),
     enabled: !!workspaceId,
+    staleTime: 0,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
   });
 }
 
@@ -18,5 +21,8 @@ export function useWorkspaceActivities() {
     queryKey: ['activities', workspaceId],
     queryFn: () => activitiesApi.byWorkspace(workspaceId!),
     enabled: !!workspaceId,
+    staleTime: 0,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
   });
 }

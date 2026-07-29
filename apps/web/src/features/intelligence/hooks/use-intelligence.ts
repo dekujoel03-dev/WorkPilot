@@ -10,6 +10,9 @@ export function useDailyBrief() {
     queryKey: ['daily-brief', workspaceId],
     queryFn: () => intelligenceApi.dailyBrief(workspaceId!),
     enabled: !!workspaceId,
+    staleTime: 0,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
   });
 }
 

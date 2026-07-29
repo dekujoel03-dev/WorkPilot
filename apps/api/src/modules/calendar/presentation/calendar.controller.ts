@@ -2,6 +2,8 @@ import {
   Controller,
   Get,
   Post,
+  Patch,
+  Delete,
   Query,
   Param,
   Body,
@@ -10,6 +12,7 @@ import {
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { CalendarService } from '../application/calendar.service';
 import { CreateMeetingDto } from './dto/create-meeting.dto';
+import { UpdateMeetingDto } from './dto/update-meeting.dto';
 import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
 import {
   CurrentUser,
@@ -53,6 +56,24 @@ export class CalendarController {
     );
   }
 
+  @Get('meetings/upcoming')
+  @ApiOperation({ summary: 'Réunions à venir (ordre chronologique)' })
+  listUpcomingMeetings(
+    @Param('workspaceId') workspaceId: string,
+    @CurrentUser() user: AuthUserPayload,
+  ) {
+    return this.calendarService.listUpcomingMeetings(workspaceId, user.id);
+  }
+
+  @Get('meetings/archive')
+  @ApiOperation({ summary: 'Archives des réunions terminées' })
+  listArchivedMeetings(
+    @Param('workspaceId') workspaceId: string,
+    @CurrentUser() user: AuthUserPayload,
+  ) {
+    return this.calendarService.listArchivedMeetings(workspaceId, user.id);
+  }
+
   @Post('meetings')
   @ApiOperation({ summary: 'Créer une réunion' })
   createMeeting(
@@ -61,5 +82,31 @@ export class CalendarController {
     @Body() dto: CreateMeetingDto,
   ) {
     return this.calendarService.createMeeting(workspaceId, user.id, dto);
+  }
+
+  @Patch('meetings/:meetingId')
+  @ApiOperation({ summary: 'Modifier ou reprogrammer une réunion' })
+  updateMeeting(
+    @Param('workspaceId') workspaceId: string,
+    @Param('meetingId') meetingId: string,
+    @CurrentUser() user: AuthUserPayload,
+    @Body() dto: UpdateMeetingDto,
+  ) {
+    return this.calendarService.updateMeeting(
+      workspaceId,
+      user.id,
+      meetingId,
+      dto,
+    );
+  }
+
+  @Delete('meetings/:meetingId')
+  @ApiOperation({ summary: 'Annuler une réunion' })
+  deleteMeeting(
+    @Param('workspaceId') workspaceId: string,
+    @Param('meetingId') meetingId: string,
+    @CurrentUser() user: AuthUserPayload,
+  ) {
+    return this.calendarService.deleteMeeting(workspaceId, user.id, meetingId);
   }
 }

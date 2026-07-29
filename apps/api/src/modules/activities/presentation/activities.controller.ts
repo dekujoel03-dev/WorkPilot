@@ -28,6 +28,7 @@ export class ActivitiesController {
     await this.access.ensureMember(workspaceId, user.id);
     return this.activityService.findByWorkspace(
       workspaceId,
+      user.id,
       limit ? parseInt(limit, 10) : 30,
     );
   }

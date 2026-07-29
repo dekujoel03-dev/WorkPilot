@@ -164,4 +164,32 @@ export class WorkspaceAccessService {
     });
     return memberships.map((m: { projectId: string }) => m.projectId);
   }
+
+  async ensureWorkspaceAdmin(workspaceId: string, userId: string) {
+    const member = await this.ensureMember(workspaceId, userId);
+    if (!['OWNER', 'ADMIN'].includes(member.role)) {
+      throw new ForbiddenException('Action réservée aux administrateurs');
+    }
+    return member;
+  }
+
+  async ensureCanManageWorkspaceSettings(workspaceId: string, userId: string) {
+    return this.ensureWorkspaceAdmin(workspaceId, userId);
+  }
+
+  projectScopeFilter(accessible: string[] | 'all') {
+    if (accessible === 'all') return {};
+    if (accessible.length === 0) {
+      return { projectId: { in: ['__none__'] } };
+    }
+    return { projectId: { in: accessible } };
+  }
+
+  projectIdScopeFilter(accessible: string[] | 'all') {
+    if (accessible === 'all') return {};
+    if (accessible.length === 0) {
+      return { id: { in: ['__none__'] } };
+    }
+    return { id: { in: accessible } };
+  }
 }

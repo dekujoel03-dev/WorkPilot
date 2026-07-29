@@ -2,7 +2,41 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { projectsApi, projectListsApi, tasksApi, taskStatusesApi } from '../api/projects.api';
 import { useAuthStore } from '@/stores/auth.store';
 import { ApiError } from '@/lib/api';
-import type { CreateProjectInput, CreateTaskInput, MoveTaskInput, UpdateTaskInput, UpdateProjectInput } from '@work-pilot/shared';
+import type { CreateProjectInput, CreateTaskInput, MoveTaskInput, UpdateTaskInput, UpdateProjectInput, Task } from '@work-pilot/shared';
+
+function patchTaskInProjectCache(
+  queryClient: ReturnType<typeof useQueryClient>,
+  workspaceId: string,
+  projectId: string,
+  updatedTask: Task,
+) {
+  queryClient.setQueryData<{ data: Task[] }>(
+    ['tasks', workspaceId, projectId],
+    (current) => {
+      if (!current) return current;
+      return {
+        ...current,
+        data: current.data.map((task) =>
+          task.id === updatedTask.id ? updatedTask : task,
+        ),
+      };
+    },
+  );
+}
+
+function invalidateTaskSideEffects(
+  queryClient: ReturnType<typeof useQueryClient>,
+  workspaceId: string,
+  projectId: string,
+) {
+  queryClient.invalidateQueries({ queryKey: ['tasks', workspaceId, projectId] });
+  queryClient.invalidateQueries({ queryKey: ['project', workspaceId, projectId] });
+  queryClient.invalidateQueries({ queryKey: ['projects', workspaceId] });
+  queryClient.invalidateQueries({ queryKey: ['dashboard-stats', workspaceId] });
+  queryClient.invalidateQueries({ queryKey: ['daily-brief', workspaceId] });
+  queryClient.invalidateQueries({ queryKey: ['reminders', workspaceId] });
+  queryClient.invalidateQueries({ queryKey: ['activities', workspaceId] });
+}
 
 export function useWorkspaceId() {
   return useAuthStore((s) => s.workspace?.id);
@@ -27,6 +61,7 @@ export function useUpdateProject(projectId: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects', workspaceId] });
       queryClient.invalidateQueries({ queryKey: ['project', workspaceId, projectId] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard-stats', workspaceId] });
     },
   });
 }
@@ -53,6 +88,7 @@ export function useCreateProject() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects', workspaceId] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard-stats', workspaceId] });
     },
   });
 }
@@ -82,9 +118,7 @@ export function useCreateTask(projectId: string) {
   return useMutation({
     mutationFn: (input: CreateTaskInput) => tasksApi.create(workspaceId!, projectId, input),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', workspaceId, projectId] });
-      queryClient.invalidateQueries({ queryKey: ['project', workspaceId, projectId] });
-      queryClient.invalidateQueries({ queryKey: ['projects', workspaceId] });
+      invalidateTaskSideEffects(queryClient, workspaceId!, projectId);
     },
   });
 }
@@ -96,10 +130,9 @@ export function useUpdateTask(projectId: string) {
   return useMutation({
     mutationFn: ({ taskId, input }: { taskId: string; input: UpdateTaskInput }) =>
       tasksApi.update(workspaceId!, taskId, input),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', workspaceId, projectId] });
-      queryClient.invalidateQueries({ queryKey: ['project', workspaceId, projectId] });
-      queryClient.invalidateQueries({ queryKey: ['projects', workspaceId] });
+    onSuccess: (result) => {
+      patchTaskInProjectCache(queryClient, workspaceId!, projectId, result.data);
+      invalidateTaskSideEffects(queryClient, workspaceId!, projectId);
     },
   });
 }
@@ -111,10 +144,9 @@ export function useMoveTask(projectId: string) {
   return useMutation({
     mutationFn: ({ taskId, input }: { taskId: string; input: MoveTaskInput }) =>
       tasksApi.move(workspaceId!, taskId, input),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', workspaceId, projectId] });
-      queryClient.invalidateQueries({ queryKey: ['project', workspaceId, projectId] });
-      queryClient.invalidateQueries({ queryKey: ['projects', workspaceId] });
+    onSuccess: (result) => {
+      patchTaskInProjectCache(queryClient, workspaceId!, projectId, result.data);
+      invalidateTaskSideEffects(queryClient, workspaceId!, projectId);
     },
   });
 }
@@ -126,9 +158,7 @@ export function useDeleteTask(projectId: string) {
   return useMutation({
     mutationFn: (taskId: string) => tasksApi.remove(workspaceId!, taskId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', workspaceId, projectId] });
-      queryClient.invalidateQueries({ queryKey: ['project', workspaceId, projectId] });
-      queryClient.invalidateQueries({ queryKey: ['projects', workspaceId] });
+      invalidateTaskSideEffects(queryClient, workspaceId!, projectId);
     },
   });
 }

@@ -2,14 +2,11 @@ import { getLastWorkspaceId, useAuthStore, type WorkspaceSummary } from '@/store
 
 /** Aligne le workspace actif avec les memberships serveur (ex. après seed ou reset DB). */
 export async function syncActiveWorkspace(): Promise<boolean> {
-  const { accessToken, workspace, user, setWorkspace } = useAuthStore.getState();
-  if (!accessToken || !user) return false;
+  const { workspace, user, setWorkspace } = useAuthStore.getState();
+  if (!user) return false;
 
   const response = await fetch('/api/v1/auth/me', {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
   });
 

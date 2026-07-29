@@ -13,6 +13,8 @@ export class DailyBriefService {
 
   async getBrief(workspaceId: string, userId: string) {
     await this.access.ensureMember(workspaceId, userId);
+    const accessible = await this.access.listAccessibleProjectIds(workspaceId, userId);
+    const taskScope = this.access.projectScopeFilter(accessible);
 
     const user = await this.prisma.user.findUniqueOrThrow({
       where: { id: userId },
@@ -37,6 +39,7 @@ export class DailyBriefService {
       where: {
         workspaceId,
         parentId: null,
+        ...taskScope,
         completedAt: null,
         OR: [{ assignees: { some: { userId } } }, { assignees: { none: {} } }],
       },
@@ -59,6 +62,7 @@ export class DailyBriefService {
       priority: t.priority,
       dueDate: t.dueDate?.toISOString() ?? null,
       estimatedTime: t.estimatedTime,
+      projectId: t.projectId,
       projectName: t.project.name,
     });
 
@@ -70,30 +74,28 @@ export class DailyBriefService {
       (t) => t.dueDate && t.dueDate >= todayStart && t.dueDate <= todayEnd,
     );
 
-    const criticalTasks = dueToday
+    const focusTasks = [...dueToday, ...userTasks.filter((t) => t.dueDate && t.dueDate < todayStart)];
+
+    const criticalTasks = focusTasks
       .filter((t) => t.priority === 'URGENT' || t.priority === 'HIGH')
       .map(mapTask);
 
     const meetings = await this.prisma.meeting.findMany({
       where: {
         workspaceId,
+        endTime: { gte: now },
         startTime: { gte: todayStart, lte: todayEnd },
       },
       orderBy: { startTime: 'asc' },
     });
 
-    const workloadMinutes = await this.workload.getDailyWorkloadMinutes(
-      userId,
-      workspaceId,
-      now,
+    const workloadMinutes = focusTasks.reduce(
+      (sum, t) => sum + (t.estimatedTime ?? 60),
+      0,
     );
     const maxDailyHours = await this.workload.getMaxDailyHours(userId);
 
-    const mainGoalCandidate = [
-      ...dueToday,
-      ...overdue.map((o) => userTasks.find((t) => t.id === o.id)!),
-    ]
-      .filter(Boolean)
+    const mainGoalCandidate = [...focusTasks]
       .sort(
         (a, b) =>
           this.workload.priorityScore(b.priority) -

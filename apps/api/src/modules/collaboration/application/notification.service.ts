@@ -67,6 +67,18 @@ export class NotificationService {
     return { data: { success: true } };
   }
 
+  async clearMeetingReminders(meetingId: string) {
+    await this.prisma.notification.deleteMany({
+      where: {
+        type: 'MEETING_REMINDER',
+        data: {
+          path: ['meetingId'],
+          equals: meetingId,
+        },
+      },
+    });
+  }
+
   async notifyTaskWatchers(params: {
     taskId: string;
     workspaceId: string;

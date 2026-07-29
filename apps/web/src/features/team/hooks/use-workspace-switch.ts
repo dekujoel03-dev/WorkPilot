@@ -4,28 +4,28 @@ import { workspaceApi } from '@/features/team/api/workspace.api';
 import { useAuthStore } from '@/stores/auth.store';
 
 export function useWorkspaces() {
-  const accessToken = useAuthStore((s) => s.accessToken);
+  const user = useAuthStore((s) => s.user);
   return useQuery({
     queryKey: ['workspaces'],
-    queryFn: () => getMe(accessToken!),
-    enabled: !!accessToken,
+    queryFn: () => getMe(),
+    enabled: !!user,
     select: (res) => res.data.workspaces,
   });
 }
 
 export function useSwitchWorkspace() {
   const queryClient = useQueryClient();
-  const setAuth = useAuthStore((s) => s.setAuth);
+  const setSession = useAuthStore((s) => s.setSession);
   const user = useAuthStore((s) => s.user);
 
   return useMutation({
     mutationFn: (workspaceId: string) => workspaceApi.switchWorkspace(workspaceId),
     onSuccess: (res) => {
       if (!user) return;
-      setAuth({
+      setSession({
         user,
         workspace: res.data.workspace,
-        tokens: res.data.tokens,
+        accessToken: res.data.tokens.accessToken,
       });
       queryClient.clear();
       queryClient.invalidateQueries({ queryKey: ['workspaces'] });

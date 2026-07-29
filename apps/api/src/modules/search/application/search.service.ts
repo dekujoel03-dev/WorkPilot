@@ -17,6 +17,9 @@ export class SearchService {
     types?: string[],
   ) {
     await this.access.ensureMember(workspaceId, userId);
+    const accessible = await this.access.listAccessibleProjectIds(workspaceId, userId);
+    const projectScope = this.access.projectIdScopeFilter(accessible);
+    const taskScope = this.access.projectScopeFilter(accessible);
 
     const query = q.trim();
     if (query.length < 1) {
@@ -32,6 +35,7 @@ export class SearchService {
             where: {
               workspaceId,
               archived: false,
+              ...projectScope,
               OR: [
                 { name: { contains: like } },
                 { description: { contains: like } },
@@ -46,6 +50,7 @@ export class SearchService {
             where: {
               workspaceId,
               parentId: null,
+              ...taskScope,
               OR: [
                 { title: { contains: like } },
                 { description: { contains: like } },
@@ -83,7 +88,10 @@ export class SearchService {
         : [],
       enabled.has('comment')
         ? this.prisma.comment.findMany({
-            where: { content: { contains: like }, task: { workspaceId } },
+            where: {
+              content: { contains: like },
+              task: { workspaceId, ...taskScope },
+            },
             include: {
               task: { select: { id: true, title: true, projectId: true } },
             },

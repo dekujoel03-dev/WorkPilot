@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
 import { join } from 'path';
-import { ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { PrismaModule } from './infrastructure/prisma/prisma.module';
 import { SupabaseModule } from './infrastructure/supabase/supabase.module';
 import { RedisModule } from './infrastructure/redis/redis.module';
@@ -53,6 +54,12 @@ import { IntegrationsModule } from './modules/integrations/integrations.module';
     CalendarModule,
     IntegrationsModule,
     AiModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
   ],
 })
 export class AppModule {}

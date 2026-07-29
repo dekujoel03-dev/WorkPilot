@@ -13,6 +13,7 @@ import { PendingInvitesBanner } from '@/features/team/components/pending-invites
 import { WorkspaceSwitcher } from '@/features/team/components/workspace-switcher';
 import { useAuthSync } from '@/features/auth/hooks/use-auth-sync';
 import { useAuthStore } from '@/stores/auth.store';
+import { logoutSession } from '@/lib/api';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { cn } from '@/lib/utils';
 import { Avatar } from '@/components/ui/avatar';
@@ -25,31 +26,31 @@ const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', href: '/app' },
   { icon: FolderKanban, label: 'Projets', href: '/app/projects' },
   { icon: Calendar, label: 'Calendrier', href: '/app/calendar' },
-  { icon: Sparkles, label: 'Assistant IA', href: '/app/assistant' },
+  { icon: Sparkles, label: 'Assistant', href: '/app/assistant' },
   { icon: Users, label: 'Équipe', href: '/app/team' },
 ];
 
 export function AppLayout() {
-  const { user, workspace, logout, accessToken } = useAuthStore();
+  const { user, workspace } = useAuthStore();
   const authReady = useAuthSync();
   const navigate = useNavigate();
   const palette = useCommandPalette();
   useWebSocket();
 
-  if (!accessToken || !user) {
+  if (!user) {
     return <Navigate to="/login" replace />;
   }
 
   if (!authReady) {
     return (
       <div className="flex h-screen items-center justify-center bg-background text-sm text-muted">
-        Chargement du workspace…
+        Chargement…
       </div>
     );
   }
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logoutSession();
     navigate('/login');
   };
 
@@ -61,7 +62,7 @@ export function AppLayout() {
             <span className="text-accent-foreground font-bold text-xs">WP</span>
           </div>
           <div className="min-w-0 flex-1">
-            <p className="font-semibold text-sm truncate font-display">{workspace?.name ?? 'Workspace'}</p>
+            <p className="font-semibold text-sm truncate font-display">{workspace?.name ?? 'Espace de travail'}</p>
             <p className="text-[11px] text-muted truncate">{workspace?.slug}</p>
           </div>
         </div>
@@ -115,7 +116,7 @@ export function AppLayout() {
       </aside>
 
       <div className="flex flex-1 flex-col overflow-hidden">
-        <header className="flex h-14 items-center justify-between gap-4 px-4 md:px-6 glass shrink-0">
+        <header className="relative z-40 flex h-14 items-center justify-between gap-4 px-4 md:px-6 glass shrink-0">
           <button
             type="button"
             onClick={palette.toggle}

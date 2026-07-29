@@ -14,6 +14,7 @@ import {
   type IEventBus,
 } from '../../../infrastructure/events/events.module';
 import { CreateWebhookDto } from '../presentation/dto/create-webhook.dto';
+import { assertSafeWebhookUrl } from '../../../common/security/ssrf-guard';
 
 const ADMIN_ROLES = ['OWNER', 'ADMIN'];
 
@@ -47,6 +48,7 @@ export class WebhooksService implements OnModuleInit {
 
   async create(workspaceId: string, userId: string, dto: CreateWebhookDto) {
     await this.ensureAdmin(workspaceId, userId);
+    await assertSafeWebhookUrl(dto.url);
     const events = dto.events.join(',');
     const secret = randomBytes(24).toString('hex');
     const hook = await this.prisma.webhook.create({
@@ -101,6 +103,11 @@ export class WebhooksService implements OnModuleInit {
 
     await Promise.allSettled(
       matching.map(async (hook) => {
+        try {
+          await assertSafeWebhookUrl(hook.url);
+        } catch {
+          return;
+        }
         const signature = createHmac('sha256', hook.secret).update(body).digest('hex');
         await fetch(hook.url, {
           method: 'POST',

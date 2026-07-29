@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../../../infrastructure/prisma/prisma.service';
 import { WorkspaceAccessService } from '../../../common/services/workspace-access.service';
 import { CreateProjectDto } from '../presentation/dto/create-project.dto';
@@ -67,6 +67,9 @@ export class ProjectsService {
 
   async create(workspaceId: string, userId: string, dto: CreateProjectDto) {
     const member = await this.access.ensureMember(workspaceId, userId);
+    if (member.role === 'GUEST') {
+      throw new ForbiddenException('Les invités ne peuvent pas créer de projets');
+    }
 
     const project = await this.prisma.$transaction(async (tx) => {
       const created = await tx.project.create({

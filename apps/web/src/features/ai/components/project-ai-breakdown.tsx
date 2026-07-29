@@ -9,17 +9,12 @@ import { useState } from 'react';
 interface ProjectAIBreakdownProps {
   projectId: string;
   backlogListId?: string;
-  lastBreakdownJob?: AIJob | null;
 }
 
-export function ProjectAIBreakdown({
-  projectId,
-  backlogListId,
-  lastBreakdownJob,
-}: ProjectAIBreakdownProps) {
+export function ProjectAIBreakdown({ projectId, backlogListId }: ProjectAIBreakdownProps) {
   const breakdown = useBreakdownProject();
   const createTask = useCreateTask(projectId);
-  const [job, setJob] = useState<AIJob | null>(lastBreakdownJob ?? null);
+  const [job, setJob] = useState<AIJob | null>(null);
   const [applied, setApplied] = useState(false);
 
   const output = parseProjectBreakdownOutput(job?.output ?? null);
@@ -52,7 +47,7 @@ export function ProjectAIBreakdown({
         loading={breakdown.isPending}
       >
         <Sparkles className="h-4 w-4" />
-        Découper avec le Senior PM
+        Proposer un plan de tâches
       </Button>
 
       {output && (

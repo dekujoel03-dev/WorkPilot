@@ -1,0 +1,449 @@
+@layer components {
+  /* ——— Page d'accueil ——— */
+  .page-accueil {
+    @apply min-h-screen overflow-x-hidden bg-background;
+  }
+
+  .decoration-arriere-plan {
+    @apply pointer-events-none fixed inset-0 -z-10;
+  }
+
+  .halo-lumiere {
+    @apply absolute left-1/2 top-0 h-[520px] w-[min(800px,100vw)] -translate-x-1/2 rounded-full bg-accent/8 blur-[120px];
+  }
+
+  /* ——— En-tête ——— */
+  .en-tete-accueil {
+    @apply sticky top-0 z-50 bg-surface/80 backdrop-blur-xl border-b border-border/60;
+  }
+
+  .en-tete-contenu {
+    @apply flex h-16 items-center justify-between gap-4;
+  }
+
+  .lien-logo {
+    @apply flex shrink-0 items-center gap-2.5;
+  }
+
+  .icone-logo {
+    @apply flex h-8 w-8 items-center justify-center rounded-[var(--radius-md)] bg-gradient-to-br from-accent to-accent-hover shadow-sm transition-transform;
+  }
+
+  .lien-logo:hover .icone-logo {
+    @apply scale-105;
+  }
+
+  .initiales-logo {
+    @apply text-sm font-bold text-accent-foreground;
+  }
+
+  .nom-marque {
+    @apply font-display font-semibold;
+  }
+
+  .actions-en-tete {
+    @apply flex shrink-0 items-center gap-2;
+  }
+
+  .bouton-connexion-mobile {
+    @apply hidden sm:block;
+  }
+
+  .interrupteur-theme {
+    @apply hidden sm:flex;
+  }
+
+  /* ——— Conteneur de section ——— */
+  .conteneur-section {
+    @apply mx-auto w-full max-w-6xl px-4 sm:px-6;
+  }
+
+  .conteneur-section--etroit {
+    @apply max-w-3xl;
+  }
+
+  /* ——— Hero ——— */
+  .section-hero {
+    @apply pb-20 pt-12 md:pb-28 md:pt-20;
+  }
+
+  .hero-grille {
+    @apply grid items-center gap-12 lg:grid-cols-2 lg:gap-16;
+  }
+
+  .hero-colonne-texte {
+    @apply flex flex-col lg:max-w-xl;
+  }
+
+  .badge-accroche {
+    @apply mb-5 w-fit;
+  }
+
+  .titre-principal {
+    text-wrap: balance;
+    @apply font-display text-4xl font-bold leading-[1.1] tracking-tight sm:text-5xl;
+  }
+
+  .titre-en-accent {
+    @apply bg-gradient-to-r from-accent to-accent-hover bg-clip-text text-transparent;
+  }
+
+  .description-hero {
+    text-wrap: pretty;
+    @apply mt-5 max-w-lg text-lg leading-relaxed text-muted;
+  }
+
+  .boutons-hero {
+    @apply mt-8 flex flex-col gap-3 sm:flex-row;
+  }
+
+  .lien-inscription-hero {
+    @apply w-full sm:w-auto;
+  }
+
+  .bouton-principal-hero {
+    @apply w-full shadow-md sm:w-auto;
+  }
+
+  .note-inscription {
+    @apply mt-4 text-sm text-muted;
+  }
+
+  .lien-compte-existant {
+    @apply text-accent hover:underline;
+  }
+
+  .hero-colonne-apercu {
+    @apply w-full min-w-0;
+  }
+
+  /* ——— Fonctionnalités ——— */
+  .section-fonctionnalites {
+    @apply scroll-mt-20 border-t border-border/60 bg-surface-sunken/30 py-16 md:py-20;
+  }
+
+  .intro-fonctionnalites {
+    @apply mx-auto mb-10 max-w-2xl text-center;
+  }
+
+  .titre-section {
+    @apply font-display text-2xl font-bold tracking-tight md:text-3xl;
+  }
+
+  .texte-intro-section {
+    @apply mt-3 text-muted;
+  }
+
+  .grille-piliers {
+    @apply grid gap-5 md:grid-cols-3 md:gap-6;
+  }
+
+  .carte-pilier {
+    @apply rounded-[var(--radius-xl)] border border-border/80 bg-surface-elevated p-6 shadow-[var(--shadow-sm)];
+  }
+
+  .icone-pilier {
+    @apply mb-4 inline-flex rounded-[var(--radius-lg)] bg-accent/10 p-3;
+  }
+
+  .titre-pilier {
+    @apply mb-2 font-display text-lg font-semibold;
+  }
+
+  .description-pilier {
+    @apply text-sm leading-relaxed text-muted;
+  }
+
+  /* ——— Étapes ——— */
+  .section-etapes {
+    @apply py-16 md:py-20;
+  }
+
+  .titre-etapes {
+    @apply mb-8 text-center font-display text-2xl font-bold tracking-tight;
+  }
+
+  .liste-etapes {
+    @apply space-y-6;
+  }
+
+  .item-etape {
+    @apply flex gap-4;
+  }
+
+  .numero-etape {
+    @apply flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent/10 font-display text-sm font-bold text-accent;
+  }
+
+  .titre-etape {
+    @apply font-semibold;
+  }
+
+  .description-etape {
+    @apply mt-0.5 text-sm text-muted;
+  }
+
+  /* ——— Appel à l'action ——— */
+  .section-appel-action {
+    @apply pb-20 md:pb-24;
+  }
+
+  .bloc-appel-action {
+    @apply rounded-[var(--radius-2xl)] bg-gradient-to-br from-accent to-accent-hover px-6 py-12 text-center sm:px-10;
+  }
+
+  .titre-appel-action {
+    @apply font-display text-2xl font-bold text-accent-foreground md:text-3xl;
+  }
+
+  .texte-appel-action {
+    @apply mx-auto mt-3 max-w-md text-accent-foreground/85;
+  }
+
+  .lien-appel-action {
+    @apply mt-6 inline-block;
+  }
+
+  .bouton-appel-action {
+    @apply border-0 bg-white text-accent shadow-lg hover:bg-white/90;
+  }
+
+  /* ——— Pied de page ——— */
+  .pied-de-page {
+    @apply border-t border-border py-8;
+  }
+
+  .pied-de-page-contenu {
+    @apply flex flex-col items-center justify-between gap-6 sm:flex-row sm:gap-4;
+  }
+
+  .contact-pied-de-page {
+    @apply flex flex-col items-center gap-2 sm:flex-row sm:gap-6;
+  }
+
+  .item-contact {
+    @apply inline-flex items-center gap-2 text-sm text-muted transition-colors hover:text-accent;
+  }
+
+  .marque-pied-de-page {
+    @apply flex items-center gap-2;
+  }
+
+  .icone-pied-de-page {
+    @apply flex h-6 w-6 items-center justify-center rounded-md bg-gradient-to-br from-accent to-accent-hover;
+  }
+
+  .initiales-pied-de-page {
+    @apply text-[10px] font-bold text-accent-foreground;
+  }
+
+  .nom-pied-de-page {
+    @apply font-display text-sm font-semibold;
+  }
+
+  .copyright {
+    @apply text-xs text-muted;
+  }
+
+  .lien-pied-de-page {
+    @apply hover:text-foreground;
+  }
+
+  /* ——— Aperçu hero (mockup app) ——— */
+  .apercu-hero {
+    @apply relative mx-auto w-full max-w-xl lg:max-w-none;
+  }
+
+  .apercu-halo {
+    @apply pointer-events-none absolute -inset-6 rounded-full bg-gradient-to-tr from-accent/15 via-accent/5 to-transparent blur-3xl opacity-70;
+  }
+
+  .apercu-fenetre {
+    @apply relative overflow-hidden rounded-[var(--radius-2xl)] border border-border/80 bg-surface-elevated shadow-[var(--shadow-lg)] ring-1 ring-accent/10;
+  }
+
+  .apercu-barre-fenetre {
+    @apply flex items-center gap-3 border-b border-border/60 bg-surface-sunken/80 px-4 py-2.5;
+  }
+
+  .apercu-boutons-fenetre {
+    @apply flex shrink-0 gap-1.5;
+  }
+
+  .apercu-bouton-fermer {
+    @apply h-2.5 w-2.5 rounded-full bg-danger/60;
+  }
+
+  .apercu-bouton-reduire {
+    @apply h-2.5 w-2.5 rounded-full bg-warning/60;
+  }
+
+  .apercu-bouton-agrandir {
+    @apply h-2.5 w-2.5 rounded-full bg-success/60;
+  }
+
+  .apercu-zone-recherche {
+    @apply flex min-w-0 flex-1 justify-center;
+  }
+
+  .apercu-champ-recherche {
+    @apply flex h-6 w-full max-w-[220px] items-center justify-center gap-1.5 rounded-md border border-border/60 bg-surface px-2;
+  }
+
+  .apercu-texte-recherche {
+    @apply truncate text-[10px] text-muted;
+  }
+
+  .apercu-corps {
+    @apply flex min-h-[300px] bg-background sm:min-h-[340px];
+  }
+
+  .apercu-menu-lateral {
+    @apply hidden w-36 shrink-0 flex-col gap-1 border-r border-border/60 bg-surface-elevated p-3 sm:flex;
+  }
+
+  .apercu-menu-entete {
+    @apply mb-2 flex items-center gap-2 px-1 py-1;
+  }
+
+  .apercu-menu-logo {
+    @apply flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-accent to-accent-hover;
+  }
+
+  .apercu-menu-initiales {
+    @apply text-[8px] font-bold text-accent-foreground;
+  }
+
+  .apercu-menu-nom-espace {
+    @apply truncate text-xs font-semibold font-display;
+  }
+
+  .apercu-item-menu {
+    @apply flex items-center gap-2 rounded-md px-2 py-1.5 text-[11px] font-medium text-muted;
+  }
+
+  .apercu-item-menu--actif {
+    @apply bg-accent/10 text-accent;
+  }
+
+  .apercu-contenu {
+    @apply flex min-w-0 flex-1 flex-col gap-3 p-3 sm:p-4;
+  }
+
+  .apercu-en-tete-dashboard {
+    @apply flex items-start justify-between gap-2;
+  }
+
+  .apercu-salutation {
+    @apply truncate text-sm font-semibold font-display;
+  }
+
+  .apercu-date {
+    @apply text-[10px] text-muted;
+  }
+
+  .apercu-notifications {
+    @apply relative shrink-0;
+  }
+
+  .apercu-pastille-notification {
+    @apply absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-accent;
+  }
+
+  .apercu-brief-quotidien {
+    @apply space-y-2 rounded-lg border border-accent/20 bg-gradient-to-br from-accent/8 to-transparent p-3;
+  }
+
+  .apercu-brief-en-tete {
+    @apply flex items-center gap-1.5;
+  }
+
+  .apercu-brief-titre {
+    @apply text-[10px] font-semibold uppercase tracking-wide text-accent;
+  }
+
+  .apercu-brief-objectif {
+    @apply text-xs font-medium leading-snug;
+  }
+
+  .apercu-brief-indicateurs {
+    @apply flex flex-wrap gap-x-4 gap-y-1;
+  }
+
+  .apercu-indicateur {
+    @apply flex items-center gap-1;
+  }
+
+  .apercu-texte-indicateur {
+    @apply text-[10px] text-muted;
+  }
+
+  .apercu-grille-stats {
+    @apply grid grid-cols-3 gap-2;
+  }
+
+  .apercu-stat {
+    @apply rounded-lg border border-border/60 bg-surface-elevated p-2 text-center sm:p-2.5 sm:text-left;
+  }
+
+  .apercu-stat-label {
+    @apply text-[9px] uppercase tracking-wide text-muted;
+  }
+
+  .apercu-stat-valeur {
+    @apply mt-0.5 text-sm font-bold tabular-nums font-display sm:text-base;
+  }
+
+  .apercu-kanban {
+    @apply mt-auto hidden grid-cols-3 gap-2 sm:grid;
+  }
+
+  .apercu-colonne-kanban {
+    @apply space-y-1.5 rounded-lg border border-border/40 bg-surface-sunken/80 p-2;
+  }
+
+  .apercu-colonne-en-tete {
+    @apply flex items-center gap-1;
+  }
+
+  .apercu-colonne-pastille {
+    @apply h-1.5 w-1.5 shrink-0 rounded-full;
+  }
+
+  .apercu-colonne-nom {
+    @apply truncate text-[9px] font-medium uppercase text-muted;
+  }
+
+  .apercu-tache {
+    @apply truncate rounded-md border border-border/50 bg-surface-elevated px-2 py-1 text-[10px] font-medium;
+  }
+
+  .apercu-tache--terminee {
+    @apply opacity-70 line-through;
+  }
+
+  /* ——— Icônes ——— */
+  .icone-tres-petite {
+    @apply h-3 w-3 shrink-0;
+  }
+
+  .icone-petite {
+    @apply h-3.5 w-3.5 shrink-0;
+  }
+
+  .icone-moyenne {
+    @apply h-4 w-4;
+  }
+
+  .icone-grande {
+    @apply h-5 w-5;
+  }
+
+  .icone-accent {
+    @apply text-accent;
+  }
+
+  .icone-discrete {
+    @apply text-muted;
+  }
+}

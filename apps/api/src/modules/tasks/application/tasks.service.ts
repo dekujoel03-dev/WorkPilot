@@ -1,7 +1,10 @@
 import { Injectable, NotFoundException, Inject } from '@nestjs/common';
+import type { ActivityAction } from '@prisma/client';
 import { calculateProjectProgress } from '@work-pilot/shared';
 import { PrismaService } from '../../../infrastructure/prisma/prisma.service';
 import { WorkspaceAccessService } from '../../../common/services/workspace-access.service';
+import { ActivityService } from '../../collaboration/application/activity.service';
+import { EventsGateway } from '../../../infrastructure/websocket/events.gateway';
 import {
   EVENT_BUS,
   type IEventBus,
@@ -17,6 +20,8 @@ export class TasksService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly access: WorkspaceAccessService,
+    private readonly activity: ActivityService,
+    private readonly gateway: EventsGateway,
     @Inject(EVENT_BUS) private readonly eventBus: IEventBus,
   ) {}
 
@@ -118,6 +123,8 @@ export class TasksService {
 
     await this.updateProjectProgress(projectId);
 
+    await this.recordTaskActivity(workspaceId, userId, task, 'CREATED');
+
     return { data: task };
   }
 
@@ -202,6 +209,8 @@ export class TasksService {
 
     await this.updateProjectProgress(task.projectId);
 
+    const action = this.resolveTaskActivityAction(task, updated, dto.statusId !== undefined);
+    await this.recordTaskActivity(workspaceId, userId, updated, action);
     await this.publishTaskUpdated(workspaceId, userId, updated);
 
     return { data: updated };
@@ -286,6 +295,8 @@ export class TasksService {
 
     await this.updateProjectProgress(task.projectId);
 
+    const action = moved.completedAt && !task.completedAt ? 'COMPLETED' : 'STATUS_CHANGED';
+    await this.recordTaskActivity(workspaceId, userId, moved, action);
     await this.publishTaskUpdated(workspaceId, userId, moved);
 
     return { data: moved };
@@ -299,6 +310,7 @@ export class TasksService {
     );
     await this.access.ensureCanEditTasks(workspaceId, task.projectId, userId);
 
+    await this.recordTaskActivity(workspaceId, userId, task, 'DELETED');
     await this.prisma.task.delete({ where: { id: taskId } });
     await this.updateProjectProgress(task.projectId);
 
@@ -324,6 +336,37 @@ export class TasksService {
     });
 
     return { data: updated };
+  }
+
+  private resolveTaskActivityAction(
+    previous: { completedAt: Date | null },
+    updated: { completedAt: Date | null },
+    statusChanged: boolean,
+  ): ActivityAction {
+    if (updated.completedAt && !previous.completedAt) return 'COMPLETED';
+    if (statusChanged) return 'STATUS_CHANGED';
+    return 'UPDATED';
+  }
+
+  private async recordTaskActivity(
+    workspaceId: string,
+    userId: string,
+    task: { id: string; title: string },
+    action: ActivityAction,
+  ) {
+    const activity = await this.activity.record({
+      workspaceId,
+      userId,
+      entityType: 'TASK',
+      entityId: task.id,
+      action,
+      metadata: { title: task.title },
+    });
+
+    this.gateway.emitToWorkspace(workspaceId, 'activity.new', {
+      activity,
+      workspaceId,
+    });
   }
 
   private async publishTaskUpdated(

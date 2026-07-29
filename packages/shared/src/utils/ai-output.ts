@@ -1,8 +1,4 @@
-import type {
-  MeetingSummaryOutput,
-  ProjectBreakdownOutput,
-  AssistantResponse,
-} from '../types/ai';
+import type { ProjectBreakdownOutput, AssistantResponse } from '../types/ai';
 
 export function parseProjectBreakdownOutput(
   output: Record<string, unknown> | null | undefined,
@@ -11,20 +7,6 @@ export function parseProjectBreakdownOutput(
     return null;
   }
   return output as unknown as ProjectBreakdownOutput;
-}
-
-export function parseMeetingSummaryOutput(
-  output: Record<string, unknown> | null | undefined,
-): MeetingSummaryOutput | null {
-  if (
-    !output ||
-    typeof output.summary !== 'string' ||
-    !Array.isArray(output.keyPoints) ||
-    !Array.isArray(output.suggestedTasks)
-  ) {
-    return null;
-  }
-  return output as unknown as MeetingSummaryOutput;
 }
 
 export function parseAssistantResponse(

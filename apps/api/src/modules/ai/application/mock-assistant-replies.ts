@@ -23,10 +23,13 @@ function detectAppCreationIntent(msg: string): boolean {
   return (
     msg.includes('appli') ||
     msg.includes('application') ||
+    msg.includes('logiciel') ||
+    msg.includes('e-commerce') ||
+    msg.includes('ecommerce') ||
     msg.includes('mvp') ||
     msg.includes('creation') ||
     msg.includes('creer') ||
-    msg.includes('creer')
+    msg.includes('gestion')
   );
 }
 
@@ -292,15 +295,15 @@ export function buildConcreteAssistantReply(input: {
       reply: [
         '1. ANALYSE',
         '',
-        `Demande reçue : « ${topic} ». En l absence de précisions complémentaires, voici un cadrage initial actionnable.`,
+        `Demande reçue : « ${topic} ». Voici un premier plan actionnable.`,
         '',
         '2. RECOMMANDATION',
         '',
-        'Formaliser l objectif mesurable, identifier 3 à 5 livrables intermédiaires et assigner un owner par livrable avant de lancer l exécution.',
+        'Formaliser l\'objectif mesurable, identifier 3 à 5 livrables intermédiaires et assigner un responsable par livrable avant de lancer l\'exécution.',
         '',
         '3. PROCHAINE ÉTAPE',
         '',
-        'Indiquez le délai cible et la taille d équipe pour affiner les user stories et le plan de delivery.',
+        'Indiquez le délai cible et la taille d\'équipe pour affiner les besoins et le plan de delivery.',
       ].join('\n'),
       documentType: 'STATUS_REPORT',
       suggestions: ['User stories MVP', 'Analyse des risques', 'Exporter vers un projet'],

@@ -1,4 +1,4 @@
-import { useAuthStore } from '@/stores/auth.store';
+import { useAuthStore, getLastWorkspaceId } from '@/stores/auth.store';
 import { syncActiveWorkspace } from '@/features/auth/lib/sync-workspace';
 
 const API_BASE = '/api/v1';
@@ -23,18 +23,15 @@ interface RequestOptions extends Omit<RequestInit, 'body'> {
   _workspaceRetried?: boolean;
 }
 
-let refreshInFlight: Promise<string> | null = null;
+let refreshInFlight: Promise<string | null> | null = null;
 
-async function refreshAccessToken(): Promise<string> {
-  const { refreshToken, workspace } = useAuthStore.getState();
-  if (!refreshToken) {
-    throw new ApiError('SESSION_EXPIRED', 'Session expirée. Reconnectez-vous.', 401);
-  }
+async function refreshAccessToken(): Promise<string | null> {
+  const { workspace } = useAuthStore.getState();
 
   const response = await fetch(`${API_BASE}/auth/refresh`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ refreshToken, workspaceId: workspace?.id }),
+    body: JSON.stringify({ workspaceId: workspace?.id }),
     credentials: 'include',
   });
 
@@ -55,7 +52,7 @@ async function refreshAccessToken(): Promise<string> {
     }
   }
 
-  if (!response.ok || !data?.data?.tokens) {
+  if (!response.ok) {
     useAuthStore.getState().logout();
     throw new ApiError(
       'SESSION_EXPIRED',
@@ -64,14 +61,17 @@ async function refreshAccessToken(): Promise<string> {
     );
   }
 
-  useAuthStore.getState().setTokens(data.data.tokens);
-  if (data.data.workspace) {
+  const accessToken = data?.data?.tokens?.accessToken ?? null;
+  if (accessToken) {
+    useAuthStore.getState().setAccessToken(accessToken);
+  }
+  if (data?.data?.workspace) {
     useAuthStore.getState().setWorkspace(data.data.workspace);
   }
-  return data.data.tokens.accessToken;
+  return accessToken;
 }
 
-async function ensureRefreshedToken(): Promise<string> {
+async function ensureRefreshedToken(): Promise<string | null> {
   if (!refreshInFlight) {
     refreshInFlight = refreshAccessToken().finally(() => {
       refreshInFlight = null;
@@ -144,12 +144,13 @@ export async function api<T>(endpoint: string, options: RequestOptions = {}): Pr
     endpoint.startsWith('/auth/login') ||
     endpoint.startsWith('/auth/register') ||
     endpoint.startsWith('/auth/supabase/') ||
-    endpoint.startsWith('/auth/refresh');
+    endpoint.startsWith('/auth/refresh') ||
+    endpoint.startsWith('/auth/logout');
 
   if (response.status === 401 && !_retried && !isAuthRoute && tokenOverride === undefined) {
     try {
-      const newToken = await ensureRefreshedToken();
-      return api<T>(endpoint, { ...options, token: newToken, _retried: true });
+      await ensureRefreshedToken();
+      return api<T>(endpoint, { ...options, _retried: true });
     } catch (err) {
       if (err instanceof ApiError) throw err;
       useAuthStore.getState().logout();
@@ -173,4 +174,68 @@ export async function api<T>(endpoint: string, options: RequestOptions = {}): Pr
   }
 
   return data as T;
+}
+
+export async function logoutSession() {
+  try {
+    await fetch(`${API_BASE}/auth/logout`, {
+      method: 'POST',
+      credentials: 'include',
+    });
+  } catch {
+    // ignore network errors during logout
+  }
+  useAuthStore.getState().logout();
+}
+
+export async function restoreSessionFromCookies(): Promise<boolean> {
+  const response = await fetch(`${API_BASE}/auth/me`, { credentials: 'include' });
+  if (response.ok) {
+    const data = (await response.json()) as {
+      data: {
+        user: {
+          id: string;
+          email: string;
+          firstName: string;
+          lastName: string;
+          avatarUrl: string | null;
+        };
+        workspaces: Array<{ id: string; name: string; slug: string; role: string }>;
+      };
+    };
+    const { workspace: persistedWorkspace } = useAuthStore.getState();
+    const lastWorkspaceId = getLastWorkspaceId();
+    const activeWorkspace =
+      (persistedWorkspace &&
+        data.data.workspaces.find((w) => w.id === persistedWorkspace.id)) ??
+      (lastWorkspaceId && data.data.workspaces.find((w) => w.id === lastWorkspaceId)) ??
+      data.data.workspaces[0] ??
+      null;
+
+    useAuthStore.getState().setSession({
+      user: data.data.user,
+      workspace: activeWorkspace
+        ? {
+            id: activeWorkspace.id,
+            name: activeWorkspace.name,
+            slug: activeWorkspace.slug,
+            role: activeWorkspace.role,
+          }
+        : null,
+    });
+    await refreshAccessToken().catch(() => null);
+    return true;
+  }
+
+  if (response.status === 401) {
+    try {
+      await refreshAccessToken();
+      return restoreSessionFromCookies();
+    } catch {
+      useAuthStore.getState().logout();
+      return false;
+    }
+  }
+
+  return false;
 }

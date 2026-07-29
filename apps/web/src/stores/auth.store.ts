@@ -33,17 +33,18 @@ function persistLastWorkspaceId(workspaceId: string | undefined) {
     // ignore storage errors
   }
 }
+
 interface AuthState {
   user: AuthUser | null;
   workspace: WorkspaceSummary | null;
+  /** En mémoire uniquement — les cookies httpOnly portent la session */
   accessToken: string | null;
-  refreshToken: string | null;
-  setAuth: (payload: {
+  setSession: (payload: {
     user: AuthUser;
     workspace: WorkspaceSummary | null;
-    tokens: { accessToken: string; refreshToken: string };
+    accessToken?: string | null;
   }) => void;
-  setTokens: (tokens: { accessToken: string; refreshToken: string }) => void;
+  setAccessToken: (accessToken: string | null) => void;
   setWorkspace: (workspace: WorkspaceSummary | null) => void;
   logout: () => void;
 }
@@ -54,21 +55,11 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       workspace: null,
       accessToken: null,
-      refreshToken: null,
-      setAuth: ({ user, workspace, tokens }) => {
+      setSession: ({ user, workspace, accessToken = null }) => {
         persistLastWorkspaceId(workspace?.id);
-        set({
-          user,
-          workspace,
-          accessToken: tokens.accessToken,
-          refreshToken: tokens.refreshToken,
-        });
+        set({ user, workspace, accessToken });
       },
-      setTokens: (tokens) =>
-        set({
-          accessToken: tokens.accessToken,
-          refreshToken: tokens.refreshToken,
-        }),
+      setAccessToken: (accessToken) => set({ accessToken }),
       setWorkspace: (workspace) => {
         persistLastWorkspaceId(workspace?.id);
         set({ workspace });
@@ -78,10 +69,15 @@ export const useAuthStore = create<AuthState>()(
           user: null,
           workspace: null,
           accessToken: null,
-          refreshToken: null,
         }),
     }),
-    { name: 'work-pilot-auth' },
+    {
+      name: 'work-pilot-auth',
+      partialize: (state) => ({
+        user: state.user,
+        workspace: state.workspace,
+      }),
+    },
   ),
 );
 

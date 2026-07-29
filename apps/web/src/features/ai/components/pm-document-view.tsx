@@ -4,12 +4,12 @@ import { Badge } from '@/components/ui/badge';
 import type { AssistantResponse } from '@work-pilot/shared';
 import { cn } from '@/lib/utils';
 
-const DOCUMENT_LABELS: Record<string, string> = {
-  USER_STORIES: 'User Stories',
+const TYPE_LABELS: Record<string, string> = {
+  USER_STORIES: 'Besoins utilisateur',
   ACCEPTANCE_CRITERIA: "Critères d'acceptation",
   RISK_ANALYSIS: 'Analyse des risques',
   STATUS_REPORT: 'Rapport de statut',
-  PROJECT_CHARTER: 'Charte de projet',
+  PROJECT_CHARTER: 'Plan de projet',
 };
 
 const PRIORITY_LABELS = { HIGH: 'Haute', MEDIUM: 'Moyenne', LOW: 'Faible' };
@@ -35,7 +35,7 @@ export function PmDocumentView({
     <div className={cn('space-y-4', className)}>
       <div className="flex flex-wrap items-center gap-2">
         {doc.documentType && (
-          <Badge variant="accent">{DOCUMENT_LABELS[doc.documentType] ?? doc.documentType}</Badge>
+          <Badge variant="accent">{TYPE_LABELS[doc.documentType] ?? doc.documentType}</Badge>
         )}
         {doc.projectName && (
           <span className="text-xs text-muted">Projet : {doc.projectName}</span>
@@ -55,15 +55,15 @@ export function PmDocumentView({
       {doc.userStories && doc.userStories.length > 0 && (
         <div className="space-y-3 pt-2 border-t border-border/60">
           <p className="text-xs font-semibold uppercase tracking-wider text-muted">
-            User Stories
+            Besoins utilisateur
           </p>
-          {doc.userStories.map((us) => (
+          {doc.userStories.map((us, index) => (
             <div
               key={us.id}
               className="rounded-[var(--radius-md)] border border-border bg-background/60 p-3 space-y-2"
             >
               <div className="flex items-center justify-between gap-2">
-                <span className="text-xs font-mono text-accent">{us.id}</span>
+                <span className="text-xs font-mono text-accent">#{index + 1}</span>
                 {us.priority && (
                   <span className="text-[10px] text-muted">
                     Priorité {PRIORITY_LABELS[us.priority]}
@@ -77,9 +77,9 @@ export function PmDocumentView({
               {us.acceptanceCriteria.length > 0 && (
                 <div className="text-xs space-y-1 pt-1">
                   <p className="font-medium text-muted">Critères d&apos;acceptation</p>
-                  {us.acceptanceCriteria.map((ca, i) => (
+                  {us.acceptanceCriteria.map((criterion, i) => (
                     <p key={i} className="pl-2 text-muted leading-relaxed">
-                      CA-{i + 1}. {ca}
+                      {i + 1}. {criterion}
                     </p>
                   ))}
                 </div>
@@ -92,19 +92,19 @@ export function PmDocumentView({
       {doc.risks && doc.risks.length > 0 && (
         <div className="space-y-2 pt-2 border-t border-border/60">
           <p className="text-xs font-semibold uppercase tracking-wider text-muted">
-            Registre des risques
+            Risques identifiés
           </p>
-          {doc.risks.map((r) => (
+          {doc.risks.map((risk, index) => (
             <div
-              key={r.id}
+              key={risk.id}
               className="rounded-[var(--radius-md)] border border-border bg-background/60 p-3 text-xs space-y-1"
             >
-              <p className="font-mono text-accent">{r.id}</p>
-              <p className="font-medium">{r.description}</p>
+              <p className="font-mono text-accent">Risque {index + 1}</p>
+              <p className="font-medium">{risk.description}</p>
               <p className="text-muted">
-                Probabilité {LEVEL_LABELS[r.probability]} — Impact {LEVEL_LABELS[r.impact]}
+                Probabilité {LEVEL_LABELS[risk.probability]} — Impact {LEVEL_LABELS[risk.impact]}
               </p>
-              <p className="text-muted leading-relaxed">Mitigation : {r.mitigation}</p>
+              <p className="text-muted leading-relaxed">Solution : {risk.mitigation}</p>
             </div>
           ))}
         </div>
@@ -113,7 +113,7 @@ export function PmDocumentView({
       {exportable && onExport && (
         <Button size="sm" onClick={onExport} loading={exporting} className="w-full sm:w-auto">
           <FolderPlus className="h-4 w-4" />
-          Créer le projet avec les User Stories
+          Créer le projet avec ces besoins
         </Button>
       )}
     </div>

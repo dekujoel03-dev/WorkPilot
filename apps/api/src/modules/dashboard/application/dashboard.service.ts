@@ -13,6 +13,9 @@ export class DashboardService {
 
   async getStats(workspaceId: string, userId: string) {
     await this.access.ensureMember(workspaceId, userId);
+    const accessible = await this.access.listAccessibleProjectIds(workspaceId, userId);
+    const projectScope = this.access.projectIdScopeFilter(accessible);
+    const taskScope = this.access.projectScopeFilter(accessible);
 
     const now = new Date();
     const todayStart = new Date(now);
@@ -28,23 +31,24 @@ export class DashboardService {
       workloadMinutes,
     ] = await Promise.all([
       this.prisma.project.findMany({
-        where: { workspaceId, archived: false },
+        where: { workspaceId, archived: false, ...projectScope },
         select: { progress: true },
       }),
-      this.prisma.task.count({ where: { workspaceId, parentId: null } }),
+      this.prisma.task.count({ where: { workspaceId, parentId: null, ...taskScope } }),
       this.prisma.task.count({
-        where: { workspaceId, parentId: null, completedAt: { not: null } },
+        where: { workspaceId, parentId: null, ...taskScope, completedAt: { not: null } },
       }),
       this.prisma.task.count({
         where: {
           workspaceId,
           parentId: null,
+          ...taskScope,
           completedAt: null,
           dueDate: { lt: todayStart },
         },
       }),
       this.prisma.task.aggregate({
-        where: { workspaceId, parentId: null },
+        where: { workspaceId, parentId: null, ...taskScope },
         _sum: { actualTime: true },
       }),
       this.workload.getMaxDailyHours(userId),

@@ -4,6 +4,7 @@ export interface DailyBriefTask {
   priority: string;
   dueDate: string | null;
   estimatedTime: number | null;
+  projectId: string;
   projectName?: string;
 }
 

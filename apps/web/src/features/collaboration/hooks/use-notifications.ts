@@ -5,7 +5,7 @@ export function useNotifications() {
   return useQuery({
     queryKey: ['notifications'],
     queryFn: () => notificationsApi.list(),
-    refetchInterval: 60_000,
+    refetchInterval: 15_000,
   });
 }
 
@@ -13,7 +13,7 @@ export function useUnreadCount() {
   return useQuery({
     queryKey: ['notifications-unread'],
     queryFn: () => notificationsApi.unreadCount(),
-    refetchInterval: 30_000,
+    refetchInterval: 15_000,
   });
 }
 

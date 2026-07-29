@@ -11,20 +11,20 @@ import { ApiError } from '@/lib/api';
 export function InvitePage() {
   const { token = '' } = useParams();
   const navigate = useNavigate();
-  const { user, accessToken, setAuth } = useAuthStore();
+  const { user, setSession } = useAuthStore();
   const { data, isLoading, error } = useInvitePreview(token);
   const acceptInvite = useAcceptInvite();
 
   const preview = data?.data;
-  const isLoggedIn = !!accessToken && !!user;
+  const isLoggedIn = !!user;
 
   const handleAccept = async () => {
     if (!user) return;
     const result = await acceptInvite.mutateAsync(token);
-    setAuth({
+    setSession({
       user,
       workspace: { ...result.data.workspace, role: preview?.role },
-      tokens: result.data.tokens,
+      accessToken: result.data.tokens.accessToken,
     });
     navigate('/app');
   };

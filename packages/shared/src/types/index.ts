@@ -35,13 +35,3 @@ export interface JwtPayload {
   workspaceId?: string;
   role?: WorkspaceRole;
 }
-
-export interface DailyBrief {
-  greeting: string;
-  date: string;
-  criticalTasks: number;
-  meetings: number;
-  overdue: number;
-  estimatedHours: number;
-  mainGoal: { id: string; title: string } | null;
-}

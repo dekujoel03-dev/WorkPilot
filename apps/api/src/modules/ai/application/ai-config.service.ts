@@ -28,7 +28,7 @@ export class AiConfigService {
           provider,
           model,
           available: true,
-          label: `PM certifié PMP/Agile · Mistral (${model})`,
+          label: `Assistant IA · Mistral`,
         },
       };
     }
@@ -40,7 +40,7 @@ export class AiConfigService {
           provider,
           model,
           available: true,
-          label: `PM certifié PMP/Agile · Ollama (${model})`,
+          label: `Assistant IA · Ollama`,
         },
       };
     }
@@ -50,7 +50,7 @@ export class AiConfigService {
         provider,
         model: null,
         available: true,
-        label: 'Mode démo (mock)',
+        label: 'Réponses simulées',
       },
     };
   }

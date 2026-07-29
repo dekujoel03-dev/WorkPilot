@@ -7,6 +7,7 @@ import { PrismaService } from '../../../infrastructure/prisma/prisma.service';
 import { WorkspaceAccessService } from '../../../common/services/workspace-access.service';
 import { WorkloadService } from './workload.service';
 import { NotificationService } from '../../collaboration/application/notification.service';
+import { MeetingReminderService } from '../../calendar/application/meeting-reminder.service';
 
 @Injectable()
 export class RemindersService {
@@ -15,11 +16,13 @@ export class RemindersService {
     private readonly access: WorkspaceAccessService,
     private readonly workload: WorkloadService,
     private readonly notifications: NotificationService,
+    private readonly meetingReminders: MeetingReminderService,
   ) {}
 
   /** Analyse les tâches à venir et génère des rappels intelligents. */
   async syncSmartReminders(workspaceId: string, userId: string) {
     await this.access.ensureMember(workspaceId, userId);
+    await this.meetingReminders.processDueReminders();
 
     const now = new Date();
     const tomorrowStart = new Date(now);

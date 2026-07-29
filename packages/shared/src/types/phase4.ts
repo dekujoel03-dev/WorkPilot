@@ -41,6 +41,19 @@ export interface CalendarEvent {
   projectName?: string;
   projectId?: string;
   allDay?: boolean;
+  status?: MeetingStatus;
+}
+
+export type MeetingStatus = 'upcoming' | 'completed';
+
+export interface MeetingItem {
+  id: string;
+  title: string;
+  description: string | null;
+  startTime: string;
+  endTime: string;
+  location: string | null;
+  status: MeetingStatus;
 }
 
 export interface CreateMeetingInput {
@@ -49,4 +62,12 @@ export interface CreateMeetingInput {
   startTime: string;
   endTime: string;
   location?: string;
+}
+
+export interface UpdateMeetingInput {
+  title?: string;
+  description?: string | null;
+  startTime?: string;
+  endTime?: string;
+  location?: string | null;
 }

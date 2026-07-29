@@ -83,7 +83,7 @@ export function AssistantPage() {
     try {
       const tasks = buildTasksFromPmDocument(doc);
       if (tasks.length === 0) {
-        setError('Aucune User Story à importer dans ce document.');
+        setError('Aucun besoin à importer dans ce document.');
         return;
       }
 
@@ -126,7 +126,7 @@ export function AssistantPage() {
     if (!text || chat.isPending) return;
 
     if (!workspaceId) {
-      setError('Aucun workspace actif. Reconnectez-vous ou choisissez un workspace.');
+      setError('Aucun espace de travail actif. Reconnectez-vous.');
       return;
     }
 
@@ -172,7 +172,7 @@ export function AssistantPage() {
           ? err.message
           : err instanceof Error
             ? err.message
-            : 'Impossible de contacter l\'assistant. Vérifiez que l\'API est démarrée (pnpm dev:api).';
+            : 'Impossible de contacter l\'assistant. Réessayez dans un instant.';
       setError(message);
     }
   };
@@ -204,9 +204,9 @@ export function AssistantPage() {
         <div className="flex items-center gap-3">
           <Sparkles className="h-6 w-6 text-accent" />
           <div>
-            <h1 className="text-xl font-semibold">Copilote PM — PMP &amp; Agile</h1>
+            <h1 className="text-xl font-semibold">Assistant projet</h1>
             <p className="text-sm text-muted">
-              {aiLabel ?? 'Chargement…'} — User Stories, critères d&apos;acceptation, risques, rapports de statut
+              {aiLabel ?? 'Chargement…'} — besoins, critères, risques et rapports
             </p>
           </div>
         </div>
@@ -222,9 +222,9 @@ export function AssistantPage() {
               {messages.length === 0 && (
                 <div className="text-center py-12 text-muted text-sm">
                   <Bot className="h-8 w-8 mx-auto mb-3 opacity-50" />
-                  <p>User Stories, critères d&apos;acceptation, analyses de risques, rapports de statut.</p>
+                  <p>Besoins utilisateur, critères, risques et rapports de statut.</p>
                   <p className="mt-2 text-xs">
-                    Ex : « Cadrage MVP application de facturation »
+                    Ex. : « Plan pour une application de facturation »
                   </p>
                 </div>
               )}

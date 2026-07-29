@@ -6,8 +6,6 @@ import {
   ArrowRight,
   CheckCircle2,
   AlertTriangle,
-  Clock,
-  Gauge,
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -30,8 +28,6 @@ export function DashboardPage() {
         { icon: TrendingUp, label: 'Progression moyenne', value: `${stats.avgProgress}%`, tone: 'text-success' },
         { icon: CheckCircle2, label: 'Tâches terminées', value: `${stats.completedTasks}/${stats.totalTasks}`, tone: 'text-success' },
         { icon: AlertTriangle, label: 'En retard', value: String(stats.overdueTasks), tone: 'text-destructive', alert: stats.overdueTasks > 0 },
-        { icon: Clock, label: 'Temps travaillé', value: `${stats.timeWorkedHours} h`, tone: 'text-accent' },
-        { icon: Gauge, label: 'Charge du jour', value: `${stats.workloadPercent}%`, tone: 'text-warning' },
       ]
     : [];
 
@@ -61,9 +57,9 @@ export function DashboardPage() {
       <DailyBriefCard />
       <SmartRemindersCard />
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {statsLoading &&
-          [1, 2, 3, 4, 5, 6].map((i) => (
+          [1, 2, 3, 4].map((i) => (
             <Skeleton key={i} className="h-28 rounded-[var(--radius-xl)]" />
           ))}
         {!statsLoading &&

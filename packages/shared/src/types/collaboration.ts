@@ -21,7 +21,8 @@ export type NotificationType =
   | 'COMMENT_ADDED'
   | 'ATTACHMENT_ADDED'
   | 'WORKSPACE_INVITE'
-  | 'PROJECT_SHARED';
+  | 'PROJECT_SHARED'
+  | 'MEETING_REMINDER';
 
 export interface UserSummary {
   id: string;
@@ -44,6 +45,7 @@ export interface Attachment {
   id: string;
   taskId: string | null;
   projectId: string | null;
+  meetingId: string | null;
   name: string;
   url: string;
   mimeType: string;

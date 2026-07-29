@@ -22,6 +22,7 @@ export function useCreateComment(taskId: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['comments', workspaceId, taskId] });
       queryClient.invalidateQueries({ queryKey: ['activities', workspaceId, taskId] });
+      queryClient.invalidateQueries({ queryKey: ['activities', workspaceId] });
     },
   });
 }
@@ -44,6 +45,30 @@ export function useUploadAttachment(taskId: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['attachments', workspaceId, taskId] });
       queryClient.invalidateQueries({ queryKey: ['activities', workspaceId, taskId] });
+      queryClient.invalidateQueries({ queryKey: ['activities', workspaceId] });
+    },
+  });
+}
+
+export function useMeetingAttachments(meetingId: string | null, enabled = true) {
+  const workspaceId = useWorkspaceId();
+  return useQuery({
+    queryKey: ['meeting-attachments', workspaceId, meetingId],
+    queryFn: () => attachmentsApi.listForMeeting(workspaceId!, meetingId!),
+    enabled: !!workspaceId && !!meetingId && enabled,
+  });
+}
+
+export function useUploadMeetingAttachment(meetingId: string) {
+  const workspaceId = useWorkspaceId();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (file: File) =>
+      attachmentsApi.uploadForMeeting(workspaceId!, meetingId, file),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['meeting-attachments', workspaceId, meetingId] });
+      queryClient.invalidateQueries({ queryKey: ['activities', workspaceId] });
     },
   });
 }

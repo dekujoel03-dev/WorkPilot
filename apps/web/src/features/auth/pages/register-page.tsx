@@ -17,7 +17,7 @@ export function RegisterPage() {
   const inviteToken = searchParams.get('invite') ?? undefined;
   const prefilledEmail = searchParams.get('email') ?? '';
   const redirectTo = getSafeRedirect(searchParams);
-  const setAuth = useAuthStore((s) => s.setAuth);
+  const setSession = useAuthStore((s) => s.setSession);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [form, setForm] = useState({
@@ -45,10 +45,10 @@ export function RegisterPage() {
         inviteToken,
         workspaceName: inviteToken ? undefined : form.workspaceName,
       });
-      setAuth({
+      setSession({
         user: response.data.user,
         workspace: response.data.workspace,
-        tokens: response.data.tokens,
+        accessToken: response.data.tokens.accessToken,
       });
       navigate(redirectTo ?? (inviteToken ? `/invite/${inviteToken}` : '/app'));
     } catch (err) {

@@ -69,7 +69,7 @@ export class SupabaseService {
     path: string;
     buffer: Buffer;
     contentType: string;
-  }): Promise<{ publicUrl: string }> {
+  }): Promise<{ storagePath: string }> {
     if (!this.client) {
       throw new Error('Supabase Storage is not configured');
     }
@@ -85,8 +85,23 @@ export class SupabaseService {
       throw new Error(`Supabase upload failed: ${error.message}`);
     }
 
-    const { data } = this.client.storage.from(this.storageBucket).getPublicUrl(params.path);
-    return { publicUrl: data.publicUrl };
+    return { storagePath: params.path };
+  }
+
+  async createSignedUrl(path: string, expiresInSeconds = 300): Promise<string> {
+    if (!this.client) {
+      throw new Error('Supabase Storage is not configured');
+    }
+
+    const { data, error } = await this.client.storage
+      .from(this.storageBucket)
+      .createSignedUrl(path, expiresInSeconds);
+
+    if (error || !data?.signedUrl) {
+      throw new Error(error?.message ?? 'Impossible de générer une URL signée');
+    }
+
+    return data.signedUrl;
   }
 
   async removeFile(path: string): Promise<void> {

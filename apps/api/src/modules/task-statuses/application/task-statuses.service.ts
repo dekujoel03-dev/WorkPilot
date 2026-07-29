@@ -26,7 +26,7 @@ export class TaskStatusesService {
   }
 
   async create(workspaceId: string, userId: string, dto: CreateTaskStatusDto) {
-    await this.access.ensureMember(workspaceId, userId);
+    await this.access.ensureWorkspaceAdmin(workspaceId, userId);
 
     const maxPosition = await this.prisma.taskStatus.aggregate({
       where: { workspaceId },
@@ -71,7 +71,7 @@ export class TaskStatusesService {
   }
 
   async reorder(workspaceId: string, userId: string, dto: ReorderDto) {
-    await this.access.ensureMember(workspaceId, userId);
+    await this.access.ensureWorkspaceAdmin(workspaceId, userId);
 
     await this.prisma.$transaction(
       dto.items.map((item) =>
@@ -90,7 +90,7 @@ export class TaskStatusesService {
     statusId: string,
     userId: string,
   ) {
-    await this.access.ensureMember(workspaceId, userId);
+    await this.access.ensureWorkspaceAdmin(workspaceId, userId);
 
     const status = await this.prisma.taskStatus.findFirst({
       where: { id: statusId, workspaceId },

@@ -1,9 +1,9 @@
 import type { Task } from '@work-pilot/shared';
 import { cn } from '@/lib/utils';
-import { PriorityBadge, formatDueDate } from './task-utils';
+import { PriorityBadge, formatDueDate, isTaskCompleted } from './task-utils';
 
 export function TaskCardPreview({ task }: { task: Task }) {
-  const due = formatDueDate(task.dueDate);
+  const due = formatDueDate(task.dueDate, { isCompleted: isTaskCompleted(task) });
 
   return (
     <div

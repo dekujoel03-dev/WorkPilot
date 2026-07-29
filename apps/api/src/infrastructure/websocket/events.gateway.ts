@@ -8,6 +8,8 @@ import { Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import type { Server, Socket } from 'socket.io';
+import { PrismaService } from '../prisma/prisma.service';
+import { ACCESS_COOKIE, parseCookieHeader } from '../../common/auth/auth-cookies';
 
 @WebSocketGateway({
   cors: {
@@ -26,11 +28,17 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
+    private readonly prisma: PrismaService,
   ) {}
 
   async handleConnection(client: Socket) {
     try {
+      const cookieToken = parseCookieHeader(
+        client.handshake.headers.cookie,
+        ACCESS_COOKIE,
+      );
       const token =
+        cookieToken ||
         (client.handshake.auth?.token as string) ||
         (client.handshake.headers.authorization?.replace('Bearer ', '') ?? '');
 
@@ -45,6 +53,21 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
           secret: this.config.getOrThrow<string>('JWT_ACCESS_SECRET'),
         },
       );
+
+      if (payload.workspaceId) {
+        const member = await this.prisma.workspaceMember.findUnique({
+          where: {
+            workspaceId_userId: {
+              workspaceId: payload.workspaceId,
+              userId: payload.sub,
+            },
+          },
+        });
+        if (!member) {
+          client.disconnect();
+          return;
+        }
+      }
 
       client.data.userId = payload.sub;
       client.data.workspaceId = payload.workspaceId;

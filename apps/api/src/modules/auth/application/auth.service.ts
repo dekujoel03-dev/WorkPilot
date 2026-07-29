@@ -259,6 +259,21 @@ export class AuthService {
     };
   }
 
+  async logout(refreshToken: string | undefined, userId?: string) {
+    if (refreshToken) {
+      await this.prisma.refreshToken.updateMany({
+        where: { token: refreshToken, revoked: false },
+        data: { revoked: true },
+      });
+    } else if (userId) {
+      await this.prisma.refreshToken.updateMany({
+        where: { userId, revoked: false },
+        data: { revoked: true },
+      });
+    }
+    return { data: { success: true } };
+  }
+
   async getMe(userId: string) {
     const user = await this.prisma.user.findUniqueOrThrow({
       where: { id: userId },

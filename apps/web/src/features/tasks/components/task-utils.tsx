@@ -2,6 +2,15 @@ import type { TaskPriority } from '@work-pilot/shared';
 import { Badge, PRIORITY_BADGE, PRIORITY_LABELS } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
+type TaskCompletionInfo = {
+  completedAt?: string | null;
+  status?: { isDone?: boolean } | null;
+};
+
+export function isTaskCompleted(task: TaskCompletionInfo) {
+  return Boolean(task.completedAt) || Boolean(task.status?.isDone);
+}
+
 export function PriorityBadge({ priority }: { priority: TaskPriority }) {
   if (priority === 'NONE') return null;
   return (
@@ -11,8 +20,11 @@ export function PriorityBadge({ priority }: { priority: TaskPriority }) {
   );
 }
 
-export function formatDueDate(date: string | null) {
-  if (!date) return null;
+export function formatDueDate(
+  date: string | null,
+  options?: { isCompleted?: boolean },
+) {
+  if (!date || options?.isCompleted) return null;
   const d = new Date(date);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -38,8 +50,14 @@ export const PRIORITY_BORDER: Record<TaskPriority, string> = {
   NONE: 'border-l-transparent',
 };
 
-export function DueDateBadge({ date }: { date: string | null }) {
-  const due = formatDueDate(date);
+export function DueDateBadge({
+  date,
+  isCompleted = false,
+}: {
+  date: string | null;
+  isCompleted?: boolean;
+}) {
+  const due = formatDueDate(date, { isCompleted });
   if (!due) return null;
   return (
     <span className={cn('text-[10px] font-medium', due.className, due.overdue && 'font-semibold')}>

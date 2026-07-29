@@ -21,7 +21,7 @@ export function LoginPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const redirectTo = getSafeRedirect(searchParams);
-  const setAuth = useAuthStore((s) => s.setAuth);
+  const setSession = useAuthStore((s) => s.setSession);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [form, setForm] = useState({ email: '', password: '' });
@@ -37,10 +37,10 @@ export function LoginPage() {
         ...form,
         ...(lastWorkspaceId ? { workspaceId: lastWorkspaceId } : {}),
       });
-      setAuth({
+      setSession({
         user: response.data.user,
         workspace: response.data.workspace,
-        tokens: response.data.tokens,
+        accessToken: response.data.tokens.accessToken,
       });
       navigate(redirectTo ?? '/app');
     } catch (err) {

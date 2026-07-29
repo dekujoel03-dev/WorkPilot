@@ -2,7 +2,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import type { Task } from '@work-pilot/shared';
 import { cn } from '@/lib/utils';
-import { PriorityBadge, DueDateBadge, PRIORITY_BORDER } from './task-utils';
+import { PriorityBadge, DueDateBadge, PRIORITY_BORDER, isTaskCompleted } from './task-utils';
 import { GripVertical, MessageSquare, Trash2 } from 'lucide-react';
 
 interface TaskCardProps {
@@ -81,7 +81,7 @@ export function TaskCard({ task, onClick, onDelete, isDeleting }: TaskCardProps)
                 {task.status.name}
               </span>
             )}
-            <DueDateBadge date={task.dueDate} />
+            <DueDateBadge date={task.dueDate} isCompleted={isTaskCompleted(task)} />
           </div>
           {commentCount > 0 && (
             <div className="flex items-center gap-1 text-[10px] text-muted">

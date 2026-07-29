@@ -158,8 +158,8 @@ export function ProjectDetailPage() {
             <div className="flex-1 min-w-0">
               <p className="font-medium text-foreground">
                 {navState.importedCount === 1
-                  ? '1 User Story importée depuis le Copilote PM'
-                  : `${navState.importedCount} User Stories importées depuis le Copilote PM`}
+                  ? '1 besoin importé depuis l\'assistant'
+                  : `${navState.importedCount} besoins importés depuis l'assistant`}
               </p>
               <p className="text-muted text-xs mt-1">
                 Les tâches sont dans « À faire ». Cliquez sur une carte pour modifier le titre, la

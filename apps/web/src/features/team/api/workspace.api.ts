@@ -1,4 +1,5 @@
 import { api } from '@/lib/api';
+import { workspacePath } from '@/lib/api-path';
 import type {
   WorkspaceMemberSummary,
   WorkspaceInvite,
@@ -7,22 +8,18 @@ import type {
   AcceptInviteResponse,
 } from '@work-pilot/shared';
 
-function ws(workspaceId: string) {
-  return `/workspaces/${workspaceId}`;
-}
-
 export const workspaceApi = {
   listMembers: (workspaceId: string) =>
-    api<{ data: WorkspaceMemberSummary[] }>(`${ws(workspaceId)}/members`),
+    api<{ data: WorkspaceMemberSummary[] }>(`${workspacePath(workspaceId)}/members`),
 
   listInvites: (workspaceId: string) =>
-    api<{ data: WorkspaceInvite[] }>(`${ws(workspaceId)}/invites`),
+    api<{ data: WorkspaceInvite[] }>(`${workspacePath(workspaceId)}/invites`),
 
   createInvite: (workspaceId: string, input: CreateWorkspaceInviteInput) =>
-    api<{ data: WorkspaceInvite }>(`${ws(workspaceId)}/invites`, { method: 'POST', body: input }),
+    api<{ data: WorkspaceInvite }>(`${workspacePath(workspaceId)}/invites`, { method: 'POST', body: input }),
 
   revokeInvite: (workspaceId: string, inviteId: string) =>
-    api<{ data: { success: boolean } }>(`${ws(workspaceId)}/invites/${inviteId}`, {
+    api<{ data: { success: boolean } }>(`${workspacePath(workspaceId)}/invites/${inviteId}`, {
       method: 'DELETE',
     }),
 

@@ -1,32 +1,42 @@
 import { useEffect, useState } from 'react';
 import { syncActiveWorkspace } from '@/features/auth/lib/sync-workspace';
+import { restoreSessionFromCookies } from '@/lib/api';
 import { useAuthStore } from '@/stores/auth.store';
 
 export function useAuthSync() {
-  const accessToken = useAuthStore((s) => s.accessToken);
-  const [ready, setReady] = useState(!accessToken);
+  const user = useAuthStore((s) => s.user);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    if (!accessToken) {
-      setReady(true);
-      return;
+    let cancelled = false;
+
+    async function sync() {
+      if (!user) {
+        const restored = await restoreSessionFromCookies().catch(() => false);
+        if (!restored && !cancelled) {
+          setReady(true);
+        }
+        return;
+      }
+
+      try {
+        await syncActiveWorkspace();
+      } catch {
+        await restoreSessionFromCookies().catch(() => {
+          useAuthStore.getState().logout();
+        });
+      } finally {
+        if (!cancelled) setReady(true);
+      }
     }
 
-    let cancelled = false;
     setReady(false);
-
-    syncActiveWorkspace()
-      .catch(() => {
-        // getMe échouera si la session est invalide ; le garde de route gère la déconnexion.
-      })
-      .finally(() => {
-        if (!cancelled) setReady(true);
-      });
+    sync();
 
     return () => {
       cancelled = true;
     };
-  }, [accessToken]);
+  }, [user?.id]);
 
   return ready;
 }

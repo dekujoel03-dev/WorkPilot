@@ -222,12 +222,12 @@ export function SettingsPage() {
               </div>
             ) : (
               <>
-                <SettingRow label="Statut" description="Provider LLM actuellement actif">
+                <SettingRow label="Statut" description="Service d'intelligence artificielle">
                   <div className="flex items-center gap-2">
                     {ai?.provider === 'mock' ? (
                       <Badge variant="warning">
                         <AlertCircle className="h-3 w-3" />
-                        Mode démo
+                        Réponses simulées
                       </Badge>
                     ) : (
                       <Badge variant="success">
@@ -241,7 +241,7 @@ export function SettingsPage() {
                     )}
                   </div>
                 </SettingRow>
-                <SettingRow label="Provider" description="Moteur utilisé pour les réponses IA">
+                <SettingRow label="Service IA" description="Moteur utilisé pour les réponses">
                   <span className="text-sm font-medium">{ai?.label ?? '—'}</span>
                 </SettingRow>
                 {ai?.model && (

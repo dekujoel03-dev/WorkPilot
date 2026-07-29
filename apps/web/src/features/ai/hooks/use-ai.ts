@@ -12,15 +12,6 @@ export function useAIJobs() {
   });
 }
 
-export function useAIJob(jobId: string | null) {
-  const workspaceId = useWorkspaceId();
-  return useQuery({
-    queryKey: ['ai-job', workspaceId, jobId],
-    queryFn: () => aiApi.getJob(workspaceId!, jobId!),
-    enabled: !!workspaceId && !!jobId,
-  });
-}
-
 export function useAssistantChat() {
   const workspaceId = useWorkspaceId();
   const queryClient = useQueryClient();
@@ -39,18 +30,6 @@ export function useBreakdownProject() {
 
   return useMutation({
     mutationFn: (projectId: string) => aiApi.breakdownProject(workspaceId!, projectId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['ai-jobs', workspaceId] });
-    },
-  });
-}
-
-export function useAssessTaskRisk() {
-  const workspaceId = useWorkspaceId();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (taskId: string) => aiApi.assessTaskRisk(workspaceId!, taskId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['ai-jobs', workspaceId] });
     },

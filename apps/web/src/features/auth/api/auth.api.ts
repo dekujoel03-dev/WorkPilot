@@ -1,6 +1,5 @@
 import { api } from '@/lib/api';
 import { isSupabaseAuthEnabled, supabase } from '@/lib/supabase';
-import { useAuthStore } from '@/stores/auth.store';
 
 interface AuthResponse {
   data: {
@@ -82,24 +81,11 @@ export async function login(payload: {
   return api<AuthResponse>('/auth/login', { method: 'POST', body: payload });
 }
 
-export async function refreshAccessToken() {
-  const refreshToken = useAuthStore.getState().refreshToken;
-  if (!refreshToken) throw new Error('No refresh token');
-
-  const response = await api<{ data: { tokens: { accessToken: string; refreshToken: string } } }>(
-    '/auth/refresh',
-    { method: 'POST', body: { refreshToken } },
-  );
-
-  useAuthStore.getState().setTokens(response.data.tokens);
-  return response.data.tokens.accessToken;
-}
-
-export async function getMe(token: string) {
+export async function getMe() {
   return api<{
     data: {
       user: AuthResponse['data']['user'];
       workspaces: Array<{ id: string; name: string; slug: string; role: string }>;
     };
-  }>('/auth/me', { token });
+  }>('/auth/me');
 }

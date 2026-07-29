@@ -44,7 +44,7 @@ export function AssistantHistoryPanel({
             <MessageCircle className="h-8 w-8 mx-auto mb-3 text-muted/40" />
             <p className="text-sm text-muted">Aucune discussion enregistrée</p>
             <p className="text-xs text-muted mt-1">
-              Vos échanges avec le Copilote PM apparaîtront ici
+              Vos échanges avec l&apos;assistant apparaîtront ici
             </p>
           </div>
         )}

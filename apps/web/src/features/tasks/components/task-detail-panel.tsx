@@ -6,7 +6,7 @@ import { TASK_PRIORITIES } from '@work-pilot/shared';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
-import { PriorityBadge, formatDueDate } from './task-utils';
+import { PriorityBadge, formatDueDate, isTaskCompleted } from './task-utils';
 import { cn } from '@/lib/utils';
 import {
   useComments,
@@ -58,7 +58,9 @@ export function TaskDetailPanel({ task, projectId, onClose, onTaskChange }: Task
   const comments = commentsData?.data ?? [];
   const attachments = attachmentsData?.data ?? [];
   const activities = activitiesData?.data ?? [];
-  const due = task ? formatDueDate(task.dueDate) : null;
+  const due = task
+    ? formatDueDate(task.dueDate, { isCompleted: isTaskCompleted(task) })
+    : null;
 
   useEffect(() => {
     if (!task) return;
