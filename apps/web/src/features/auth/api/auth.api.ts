@@ -15,6 +15,10 @@ interface AuthResponse {
   };
 }
 
+type RegisterResult =
+  | AuthResponse
+  | { data: { needsEmailConfirmation: true; email: string } };
+
 export async function register(payload: {
   email: string;
   password: string;
@@ -22,32 +26,9 @@ export async function register(payload: {
   lastName: string;
   workspaceName?: string;
   inviteToken?: string;
-}) {
-  if (isSupabaseAuthEnabled() && supabase) {
-    const { data, error } = await supabase.auth.signUp({
-      email: payload.email,
-      password: payload.password,
-    });
-
-    if (error) throw new Error(error.message);
-
-    const accessToken = data.session?.access_token;
-    if (!accessToken) {
-      throw new Error(
-        'Confirmez votre email avant de continuer, ou désactivez la confirmation email dans Supabase (dev).',
-      );
-    }
-
-    return api<AuthResponse>('/auth/supabase/register', {
-      method: 'POST',
-      body: {
-        firstName: payload.firstName,
-        lastName: payload.lastName,
-        workspaceName: payload.workspaceName,
-        inviteToken: payload.inviteToken,
-      },
-      token: accessToken,
-    });
+}): Promise<RegisterResult> {
+  if (isSupabaseAuthEnabled()) {
+    return api<RegisterResult>('/auth/supabase/signup', { method: 'POST', body: payload });
   }
 
   return api<AuthResponse>('/auth/register', { method: 'POST', body: payload });

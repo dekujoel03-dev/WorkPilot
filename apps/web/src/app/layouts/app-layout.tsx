@@ -15,6 +15,7 @@ import { useAuthSync } from '@/features/auth/hooks/use-auth-sync';
 import { useAuthStore } from '@/stores/auth.store';
 import { logoutSession } from '@/lib/api';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { Logo } from '@/components/logo';
 import { cn } from '@/lib/utils';
 import { Avatar } from '@/components/ui/avatar';
 import { NotificationBell } from '@/features/collaboration/components/notification-bell';
@@ -58,9 +59,7 @@ export function AppLayout() {
     <div className="flex h-screen overflow-hidden bg-background">
       <aside className="hidden md:flex w-[260px] flex-col border-r border-border/80 bg-surface-elevated">
         <div className="flex h-16 items-center gap-3 px-5 border-b border-border/80">
-          <div className="h-8 w-8 rounded-[var(--radius-md)] bg-gradient-to-br from-accent to-accent-hover flex items-center justify-center shrink-0 shadow-sm">
-            <span className="text-accent-foreground font-bold text-xs">WP</span>
-          </div>
+          <Logo variant="mark" asLink={false} size="sm" className="shrink-0" />
           <div className="min-w-0 flex-1">
             <p className="font-semibold text-sm truncate font-display">{workspace?.name ?? 'Espace de travail'}</p>
             <p className="text-[11px] text-muted truncate">{workspace?.slug}</p>

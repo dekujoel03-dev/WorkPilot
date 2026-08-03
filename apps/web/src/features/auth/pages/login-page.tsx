@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { Logo } from '@/components/logo';
 import { login } from '@/features/auth/api/auth.api';
 import { useAuthStore, getLastWorkspaceId } from '@/stores/auth.store';
 import { ApiError } from '@/lib/api';
@@ -64,12 +65,7 @@ export function LoginPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <header className="flex items-center justify-between p-6">
-        <Link to="/" className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-[var(--radius-md)] bg-accent flex items-center justify-center">
-            <span className="text-accent-foreground font-bold text-sm">WP</span>
-          </div>
-          <span className="font-semibold">WorkPilot</span>
-        </Link>
+        <Logo variant="banner" />
         <ThemeToggle />
       </header>
 

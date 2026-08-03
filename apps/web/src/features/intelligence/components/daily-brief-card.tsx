@@ -54,14 +54,15 @@ export function DailyBriefCard() {
               <Sparkles className="h-5 w-5 text-accent" />
             </div>
             <div>
-              <CardTitle className="text-xl font-display">{brief.greeting}</CardTitle>
-              <p className="text-sm text-muted capitalize mt-0.5">
+              <CardTitle className="text-xl font-display capitalize">
                 {new Date(brief.date).toLocaleDateString('fr-FR', {
                   weekday: 'long',
                   day: 'numeric',
                   month: 'long',
                 })}
-              </p>
+              </CardTitle>
+              <p className="text-sm text-muted mt-0.5">Brief du jour</p>
+
             </div>
           </div>
         </CardHeader>

@@ -60,6 +60,17 @@ export class AuthController {
     return result;
   }
 
+  @Post('supabase/signup')
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
+  @ApiOperation({ summary: 'Inscription via Supabase (admin API côté serveur)' })
+  async supabaseSignUp(@Body() dto: RegisterDto, @Res({ passthrough: true }) res: Response) {
+    const result = await this.authService.signUpWithSupabase(dto);
+    if ('tokens' in result.data) {
+      this.applyAuthCookies(res, result.data.tokens);
+    }
+    return result;
+  }
+
   @Post('supabase/session')
   @Throttle({ default: { limit: 20, ttl: 60000 } })
   @ApiOperation({ summary: 'Échanger une session Supabase contre des tokens applicatifs' })

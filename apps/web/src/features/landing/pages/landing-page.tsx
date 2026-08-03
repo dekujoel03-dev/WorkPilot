@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { cn } from '@/lib/utils';
+import { Logo } from '@/components/logo';
 import { HeroPreview } from '../components/hero-preview';
 
 const CONTACT = {
@@ -61,12 +62,7 @@ export function LandingPage() {
 
       <header className="en-tete-accueil">
         <ConteneurSection className="en-tete-contenu">
-          <Link to="/" className="lien-logo">
-            <div className="icone-logo">
-              <span className="initiales-logo">WP</span>
-            </div>
-            <span className="nom-marque">WorkPilot</span>
-          </Link>
+          <Logo variant="banner" linkClassName="lien-logo" />
 
           <div className="actions-en-tete">
             <ThemeToggle className="interrupteur-theme" />
@@ -101,9 +97,9 @@ export function LandingPage() {
                 </Badge>
 
                 <h1 className="titre-principal">
-                  Pilotez vos projets.{' '}
-                  <span className="titre-en-accent">
-                    L&apos;IA Vous aide.
+                  Pilotez vos projets.
+                  <span className="titre-en-accent titre-en-accent--ligne">
+                    L&apos;IA vous aide.
                   </span>
                 </h1>
 
@@ -228,12 +224,7 @@ export function LandingPage() {
 
       <footer className="pied-de-page">
         <ConteneurSection className="pied-de-page-contenu">
-          <div className="marque-pied-de-page">
-            <div className="icone-pied-de-page">
-              <span className="initiales-pied-de-page">WP</span>
-            </div>
-            <span className="nom-pied-de-page">WorkPilot</span>
-          </div>
+          <Logo variant="banner" size="sm" linkClassName="marque-pied-de-page" />
 
           <div className="contact-pied-de-page">
             <a href={`mailto:${CONTACT.email}`} className="item-contact">
@@ -248,9 +239,9 @@ export function LandingPage() {
 
           <p className="copyright">
             © {new Date().getFullYear()} WorkPilot ·{' '}
-            <Link to="/login" className="lien-pied-de-page">
-              Connexion
-            </Link>
+            <span className="texte-copyright">
+              Tous droits réservés
+            </span>
           </p>
         </ConteneurSection>
       </footer>

@@ -8,6 +8,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { ProgressBar } from '@/components/ui/progress';
+import { Logo } from '@/components/logo';
 import { cn } from '@/lib/utils';
 
 export function HeroPreview() {
@@ -33,10 +34,8 @@ export function HeroPreview() {
         <div className="apercu-corps">
           <div className="apercu-menu-lateral">
             <div className="apercu-menu-entete">
-              <div className="apercu-menu-logo">
-                <span className="apercu-menu-initiales">WP</span>
-              </div>
-              <span className="apercu-menu-nom-espace">Acme</span>
+              <Logo variant="mark" tone="light" asLink={false} size="xs" />
+              <span className="apercu-menu-nom-espace">S.A.R.L</span>
             </div>
             {[
               { icon: LayoutDashboard, label: 'Dashboard', active: true },

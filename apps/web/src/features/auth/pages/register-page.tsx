@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { Logo } from '@/components/logo';
 import { register } from '@/features/auth/api/auth.api';
 import { useAuthStore } from '@/stores/auth.store';
 import { ApiError } from '@/lib/api';
@@ -20,6 +21,7 @@ export function RegisterPage() {
   const setSession = useAuthStore((s) => s.setSession);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [emailConfirmationSent, setEmailConfirmationSent] = useState('');
   const [form, setForm] = useState({
     firstName: '',
     lastName: '',
@@ -45,6 +47,12 @@ export function RegisterPage() {
         inviteToken,
         workspaceName: inviteToken ? undefined : form.workspaceName,
       });
+
+      if ('needsEmailConfirmation' in response.data && response.data.needsEmailConfirmation) {
+        setEmailConfirmationSent(response.data.email);
+        return;
+      }
+
       setSession({
         user: response.data.user,
         workspace: response.data.workspace,
@@ -67,12 +75,7 @@ export function RegisterPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <header className="flex items-center justify-between p-6">
-        <Link to="/" className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-[var(--radius-md)] bg-accent flex items-center justify-center">
-            <span className="text-accent-foreground font-bold text-sm">WP</span>
-          </div>
-          <span className="font-semibold">WorkPilot</span>
-        </Link>
+        <Logo variant="banner" />
         <ThemeToggle />
       </header>
 
@@ -95,6 +98,24 @@ export function RegisterPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
+              {emailConfirmationSent ? (
+                <div className="space-y-4 text-center">
+                  <p className="text-sm text-muted">
+                    Un email de confirmation a été envoyé à{' '}
+                    <span className="font-medium text-foreground">{emailConfirmationSent}</span>.
+                  </p>
+                  <p className="text-sm text-muted">
+                    Cliquez sur le lien dans l&apos;email, puis connectez-vous pour accéder à votre
+                    workspace.
+                  </p>
+                  <Link to="/login">
+                    <Button className="w-full">
+                      Se connecter
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                </div>
+              ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-2 gap-3">
                   <Input
@@ -144,12 +165,15 @@ export function RegisterPage() {
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </form>
+              )}
+              {!emailConfirmationSent && (
               <p className="mt-6 text-center text-sm text-muted">
                 Déjà un compte ?{' '}
                 <Link to="/login" className="text-accent hover:underline font-medium">
                   Se connecter
                 </Link>
               </p>
+              )}
             </CardContent>
           </Card>
         </motion.div>

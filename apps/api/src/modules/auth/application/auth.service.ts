@@ -320,6 +320,56 @@ export class AuthService {
     return this.buildAuthResponse(user, workspaceId);
   }
 
+  async signUpWithSupabase(dto: RegisterDto) {
+    if (!this.supabase.isConfigured()) {
+      throw new BadRequestException('Supabase Auth non configuré');
+    }
+
+    const email = dto.email.toLowerCase();
+    const existing = await this.prisma.user.findUnique({ where: { email } });
+    if (existing) {
+      throw new ConflictException('Un compte existe déjà avec cet email');
+    }
+
+    const isDev = this.config.get<string>('NODE_ENV') !== 'production';
+
+    let supabaseUser;
+    try {
+      supabaseUser = await this.supabase.createAuthUser(email, dto.password, {
+        emailConfirm: isDev,
+      });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Inscription Supabase impossible';
+      throw new BadRequestException(message);
+    }
+
+    if (!supabaseUser?.email) {
+      throw new BadRequestException('Impossible de créer le compte Supabase');
+    }
+
+    if (isDev && !supabaseUser.email_confirmed_at) {
+      const confirmed = await this.supabase.confirmAuthUser(supabaseUser.id);
+      if (!confirmed?.email) {
+        throw new BadRequestException('Impossible de confirmer le compte Supabase');
+      }
+      supabaseUser = confirmed;
+    }
+
+    const emailConfirmed = !!supabaseUser.email_confirmed_at;
+    const authResponse = await this.provisionAppUserFromSupabase(supabaseUser, dto);
+
+    if (!emailConfirmed) {
+      return {
+        data: {
+          needsEmailConfirmation: true as const,
+          email,
+        },
+      };
+    }
+
+    return authResponse;
+  }
+
   async registerWithSupabase(
     supabaseAccessToken: string,
     dto: SupabaseRegisterDto,
@@ -345,6 +395,15 @@ export class AuthService {
     if (existing) {
       throw new ConflictException('Un compte existe déjà avec cet email');
     }
+
+    return this.provisionAppUserFromSupabase(supabaseUser, dto);
+  }
+
+  private async provisionAppUserFromSupabase(
+    supabaseUser: { id: string; email?: string; email_confirmed_at?: string | null },
+    dto: SupabaseRegisterDto,
+  ) {
+    const email = supabaseUser.email!.toLowerCase();
 
     if (dto.inviteToken) {
       const user = await this.prisma.user.create({

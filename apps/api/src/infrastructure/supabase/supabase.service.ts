@@ -42,27 +42,70 @@ export class SupabaseService {
     return data.user;
   }
 
-  async createAuthUser(email: string, password: string) {
+  async createAuthUser(
+    email: string,
+    password: string,
+    options?: { emailConfirm?: boolean },
+  ) {
     if (!this.client) return null;
+
+    const emailConfirm = options?.emailConfirm ?? false;
 
     const { data, error } = await this.client.auth.admin.createUser({
       email,
       password,
-      email_confirm: true,
+      email_confirm: emailConfirm,
     });
 
     if (error) {
       if (error.message.toLowerCase().includes('already')) {
-        const { data: listData } = await this.client.auth.admin.listUsers();
-        const existing = listData.users.find(
-          (u) => u.email?.toLowerCase() === email.toLowerCase(),
-        );
-        return existing ?? null;
+        const existing = await this.findAuthUserByEmail(email);
+        if (existing && emailConfirm && !existing.email_confirmed_at) {
+          return this.confirmAuthUser(existing.id);
+        }
+        return existing;
       }
       throw new Error(error.message);
     }
 
     return data.user;
+  }
+
+  async confirmAuthUser(userId: string) {
+    if (!this.client) return null;
+
+    const { data, error } = await this.client.auth.admin.updateUserById(userId, {
+      email_confirm: true,
+    });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return data.user;
+  }
+
+  private async findAuthUserByEmail(email: string) {
+    if (!this.client) return null;
+
+    const normalized = email.toLowerCase();
+    let page = 1;
+    const perPage = 200;
+
+    while (page <= 10) {
+      const { data, error } = await this.client.auth.admin.listUsers({ page, perPage });
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      const match = data.users.find((u) => u.email?.toLowerCase() === normalized);
+      if (match) return match;
+
+      if (data.users.length < perPage) break;
+      page += 1;
+    }
+
+    return null;
   }
 
   async uploadFile(params: {

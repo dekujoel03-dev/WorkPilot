@@ -16,6 +16,7 @@ import { useDashboardStats } from '../hooks/use-dashboard';
 import { ActivityFeed } from '../components/activity-feed';
 import { useAuthStore } from '@/stores/auth.store';
 import { cn } from '@/lib/utils';
+import { formatTimeGreeting } from '@/lib/greeting';
 
 export function DashboardPage() {
   const user = useAuthStore((s) => s.user);
@@ -40,7 +41,7 @@ export function DashboardPage() {
       >
         <div>
           <h1 className="text-2xl font-bold tracking-tight font-display">
-            Bonjour{user?.firstName ? `, ${user.firstName}` : ''} 👋
+            {formatTimeGreeting(user?.firstName)} 
           </h1>
           <p className="text-sm text-muted mt-1">Voici votre journée en un coup d'œil</p>
         </div>
